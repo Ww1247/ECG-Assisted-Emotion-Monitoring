@@ -29,7 +29,7 @@ change the height and width for each of the contributors from 80 to 50.
 
 [//]: contributor-faces
 
-<a href="https://github.com/Ww1247"><img src="https://avatars.githubusercontent.com/u/199613138?v=4" title="Student_Name" width="50" height="50"></a>
+  <img src="https://avatars.githubusercontent.com/u/199613138?v=4" title="Student_Name" width="50" height="50" style="border-radius: 50%; object-fit: cover;">
 
 [//]: contributor-faces
 

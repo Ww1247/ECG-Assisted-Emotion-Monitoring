@@ -19,16 +19,6 @@ Here is the Raspberry Pi cross-compilation instructions: ([English](https://gith
 |  1   | Camera         |             | Video and still image capture               | 1 (pcs)  | Facial recognition  |           |
 
 
-### Project Main Contributors
-
-| Name         | ID      | Role                                                                                                                              |
-| ------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
-|              |         |                                                                                                                                   |
-|              |         |                                                                                                                                   |
-|              |         |                                                                                                                                   |
-|              |         |                                                                                                                                   |
-|              |         |                                                                                                                                   |
-
 # Contributors
 
 <!---
@@ -42,6 +32,14 @@ change the height and width for each of the contributors from 80 to 50.
 <a href="https://github.com/Ww1247"><img src="https://avatars.githubusercontent.com/u/199613138?v=4" title="Student_Name" width="50" height="50"></a>
 
 [//]: contributor-faces
+
+| Name         | ID      | Role                                                                                                                              |
+| ------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
+|              |         |                                                                                                                                   |
+|              |         |                                                                                                                                   |
+|              |         |                                                                                                                                   |
+|              |         |                                                                                                                                   |
+|              |         |                                                                                                                                   |
 
 # License
 MIT License Copyright (c) 2025 Wx1247

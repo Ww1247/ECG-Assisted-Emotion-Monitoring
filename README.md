@@ -17,3 +17,20 @@ Here is the Raspberry Pi cross-compilation instructions: ([English](https://gith
 | Item | Component Name | Part Number | Description                                 | Quantity |  Notes              | Datasheet |
 |:----:|:--------------:|:-----------:|:-------------------------------------------:|:--------:|:-------------------:|:---------:|
 |  1   | Camera         |             | Video and still image capture               | 1 (pcs)  | Facial recognition  |           |
+
+
+### Project Main Contributors
+
+| Name         | ID      | Role                                                                                                                              |
+| ------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
+|              |         |                                                                                                                                   |
+|              |         |                                                                                                                                   |
+|              |         |                                                                                                                                   |
+|              |         |                                                                                                                                   |
+|              |         |                                                                                                                                   |
+
+### Contacts
+
+
+# License
+MIT License Copyright (c) 2024 Wx1247

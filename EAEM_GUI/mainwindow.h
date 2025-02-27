@@ -2,9 +2,26 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QPushButton>  // Include necessary widgets
-#include <QVBoxLayout>  // Layout manager
 #include <QApplication>
+
+#include <QWidget>
+#include <QGridLayout>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QGroupBox>
+#include <QPushButton>
+#include <QLabel>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QRadioButton>
+#include <QStatusBar>
+#include <QMenuBar>
+#include <QAction>
+#include <QStackedWidget>
+#include <QToolButton>
+#include <QTextEdit>
+#include <QFrame>
+
 
 class MainWindow : public QMainWindow
 {

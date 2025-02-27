@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
 # Find Qt5 or Qt6
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets PrintSupport)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets PrintSupport)
 
 # Project source files
 set(PROJECT_SOURCES
@@ -32,12 +32,15 @@ else()
     else()
         add_executable(EAEM_GUI
             ${PROJECT_SOURCES}
+            interface/plot_driver.h interface/plot_driver.cpp
+            interface/qcustomplot.h interface/qcustomplot.cpp
         )
     endif()
 endif()
 
 # Link Qt Widgets library
-target_link_libraries(EAEM_GUI PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(EAEM_GUI PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
+                                       Qt${QT_VERSION_MAJOR}::PrintSupport)
 
 # Install settings
 include(GNUInstallDirs)

@@ -33,4 +33,4 @@ Here is the Raspberry Pi cross-compilation instructions: ([English](https://gith
 
 
 # License
-MIT License Copyright (c) 2024 Wx1247
+MIT License Copyright (c) 2025 Wx1247

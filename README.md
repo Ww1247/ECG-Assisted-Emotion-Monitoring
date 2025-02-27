@@ -33,13 +33,13 @@ change the height and width for each of the contributors from 80 to 50.
 
 [//]: contributor-faces
 
-| Name         | ID      | Role                                                                                                                              |
-| ------------ | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
-|              |         |                                                                                                                                   |
-|              |         |                                                                                                                                   |
-|              |         |                                                                                                                                   |
-|              |         |                                                                                                                                   |
-|              |         |                                                                                                                                   |
+| Name         | ID       | Role                                                                                                                              |
+| ------------ |:--------:| --------------------------------------------------------------------------------------------------------------------------------- |
+|              | 3007288W | Responsible for the QT part of the code, including GUI design and communication code creation.                                    |
+|              |          |                                                                                                                                   |
+|              |          |                                                                                                                                   |
+|              |          |                                                                                                                                   |
+|              |          |                                                                                                                                   |
 
 # License
 MIT License Copyright (c) 2025 Wx1247

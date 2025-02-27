@@ -14,8 +14,6 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets PrintSupport)
 # Project source files
 set(PROJECT_SOURCES
         main.cpp
-        mainwindow.cpp
-        mainwindow.h
 )
 
 # If Qt version is 6, use qt_add_executable, otherwise use add_executable for Qt 5
@@ -25,29 +23,30 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
     )
 else()
-    if(ANDROID)
-        add_library(EAEM_GUI SHARED
-            ${PROJECT_SOURCES}
-        )
-    else()
-        add_executable(EAEM_GUI
-            ${PROJECT_SOURCES}
-            interface/plot_driver.h interface/plot_driver.cpp
-            interface/qcustomplot.h interface/qcustomplot.cpp
-        )
-    endif()
+    add_executable(EAEM_GUI
+        ${PROJECT_SOURCES}
+        interface/plot_driver.h interface/plot_driver.cpp
+        interface/qcustomplot.h interface/qcustomplot.cpp
+        interface/mainwindow.h interface/mainwindow.cpp
+    )
 endif()
 
+# Add directories to the include path.
+target_include_directories(EAEM_GUI PRIVATE
+        ${CMAKE_SOURCE_DIR}/interface
+)
+
 # Link Qt Widgets library
-target_link_libraries(EAEM_GUI PRIVATE Qt${QT_VERSION_MAJOR}::Widgets
-                                       Qt${QT_VERSION_MAJOR}::PrintSupport)
+target_link_libraries(EAEM_GUI PRIVATE
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::PrintSupport)
 
 # Install settings
 include(GNUInstallDirs)
 install(TARGETS EAEM_GUI
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+        BUNDLE DESTINATION .
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 # Finalize Qt executable for Qt 6

@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     // Setting the geometric properties of the main window
-    setGeometry(0, 0, 833, 1212);
+    setGeometry(0, 0, 850, 850);
     setWindowTitle("EAEM_GUI");
 
     // Creating Centre Controls

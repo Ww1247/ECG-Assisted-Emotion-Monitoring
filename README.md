@@ -14,6 +14,6 @@ Here is the Raspberry Pi cross-compilation instructions: ([English](https://gith
 # Hardware Development Guidance
 
 ### Sensors Components
-| Item | Component Name | Part Number | Description                                 | Quantity |  Notes              |
-|:----:|:--------------:|:-----------:|:-------------------------------------------:|:--------:|:-------------------:|
-|  1   | Camera         |             | Video and still image capture               | 1 (pcs)  | Facial recognition  |
+| Item | Component Name | Part Number | Description                                 | Quantity |  Notes              | Datasheet |
+|:----:|:--------------:|:-----------:|:-------------------------------------------:|:--------:|:-------------------:|:---------:|
+|  1   | Camera         |             | Video and still image capture               | 1 (pcs)  | Facial recognition  |           |

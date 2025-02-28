@@ -16,7 +16,7 @@ This section documents the process of building the hardware, as well as problems
   <img src="./pictures/sensors_wire_connection.png" width="500"/>
 </p>
 
-The circuit diagram has been created by *Frizing*, you can follow the instructions above to connect the circuit and make sure all sensors are connected to the Raspberry Pi through the correct wiring, if you have more than one sensor, just extend the connections on the I2C bus (SDA and SCL). The circuit diagram files drawn by *Frizing* have been uploaded to the project repository and can be viewed using the Frizing software.
+The circuit diagram has been created by *Frizing*, you can follow the instructions above to connect the circuit and make sure all sensors are connected to the Raspberry Pi through the correct wiring, if you have more than one sensor, just extend the connections on the I2C bus (SDA and SCL). The circuit diagram files drawn by *Frizing* have been uploaded to the project repository named as `sensors_connection_instruction.fzz` and can be viewed using the *Frizing* software.
 
 ### Raspberry Pi
 

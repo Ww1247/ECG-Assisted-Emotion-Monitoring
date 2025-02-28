@@ -39,6 +39,63 @@
 
 ## 传感器开发指南
 
+该项目使用了 `pigpio` 库，为 Raspberry Pi 提供高效的 GPIO 控制和与外部传感器的交互。`pigpio` 是一个在 Raspberry Pi 上运行的 C 语言库，它提供了强大的 GPIO 控制功能，其中包括数字输入、输出、PWM、I2C、SPI 和串行通信等。本项目使用 `pigpio` 库的原因是因为该库能够为传感器提供精准时间控制，并且支持多线程操作，可以在并发环境中稳定运行，适用于复杂的传感器数据采集和处理任务。
+
+如果还未安装 `pigpio` 库，请通过以下代码进行安装。
+
+```bash
+sudo apt install pigpio
+```
+
+通过运行以下命令来验证 `pigpio` 是否正确安装.
+
+```bash
+pigpiod -v
+```
+
+<br>为了在 CMake 中正确地链接 `pigpio` 库，你需要按照以下步骤对 CMakeLists.txt 进行配置
+
+```bash
+# 设置 pigpio 库的路径
+find_library(PIGPIO_LIB pigpio)
+
+# 链接 pigpio 库
+target_link_libraries(Project_Name ${PIGPIO_LIB})
+```
+
+<br>下面给出一个如何使用 `pigpio` 库调用 I2C 的简单例子：
+
+```C++
+#include <pigpio.h>
+
+// 初始化 pigpio 库
+if (gpioInitialise() < 0) {
+    std::cerr << "pigpio initialization failed!" << std::endl;
+    return -1; // 初始化失败，退出程序
+}
+
+int i2cHandle = i2cOpen(1, 0x40, 0);  // 打开 I2C 总线 1，设备地址为 0x40
+if (i2cHandle < 0) {
+    std::cerr << "Failed to open I2C bus!" << std::endl;
+    return -1;
+}
+
+char data[] = {0x01, 0xFF};  // 发送数据，给 0x01 寄存器写入 0xFF 值
+i2cWrite(i2cHandle, data, sizeof(data));
+
+char buffer[10];
+int readBytes = i2cRead(i2cHandle, buffer, sizeof(buffer)); // 读取数据
+if (readBytes >= 0) {
+    std::cout << "I2C read data: ";
+    for (int i = 0; i < readBytes; i++) {
+        std::cout << (int)buffer[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
+gpioTerminate();  // 关闭 pigpio 库
+```
+
 ### 脉搏传感器
 
 ### 湿度、温度传感器

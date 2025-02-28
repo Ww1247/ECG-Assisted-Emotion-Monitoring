@@ -39,6 +39,63 @@ The circuit diagram has been created by *Frizing*, you can follow the instructio
 
 ## Sensor Development Guide
 
+This project uses the `pigpio` library to provide efficient GPIO control and interaction with external sensors on the Raspberry Pi. `pigpio` is a C language library running on the Raspberry Pi that offers powerful GPIO control features, including digital input, output, PWM, I2C, SPI, and serial communication. The reason for using the `pigpio` library in this project is that it provides precise timing control for sensors, supports multithreading, and can run stably in a concurrent environment, making it suitable for complex sensor data acquisition and processing tasks.
+
+If `pigpio` is not yet installed, you can install it with the following command:
+
+```bash
+sudo apt install pigpio
+```
+
+To verify if `pigpio` is correctly installed, run the following command:
+
+```bash
+pigpiod -v
+```
+
+<br>To correctly link the `pigpio` library in CMake, configure the `CMakeLists.txt` file as follows:
+
+```bash
+# Set the path for the pigpio library
+find_library(PIGPIO_LIB pigpio)
+
+# Link the pigpio library
+target_link_libraries(Project_Name ${PIGPIO_LIB})
+```
+
+<br>Here is a simple example of how to use the `pigpio` library to call I2C:
+
+```C++
+#include <pigpio.h>
+
+// Initialize the pigpio library
+if (gpioInitialise() < 0) {
+    std::cerr << "pigpio initialization failed!" << std::endl;
+    return -1; // Initialization failed, exit the program
+}
+
+int i2cHandle = i2cOpen(1, 0x40, 0);  // Open I2C bus 1, device address 0x40
+if (i2cHandle < 0) {
+    std::cerr << "Failed to open I2C bus!" << std::endl;
+    return -1;
+}
+
+char data[] = {0x01, 0xFF};  // Send data, write 0xFF to register 0x01
+i2cWrite(i2cHandle, data, sizeof(data));
+
+char buffer[10];
+int readBytes = i2cRead(i2cHandle, buffer, sizeof(buffer)); // Read data
+if (readBytes >= 0) {
+    std::cout << "I2C read data: ";
+    for (int i = 0; i < readBytes; i++) {
+        std::cout << (int)buffer[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
+gpioTerminate();  // Terminate the pigpio library
+```
+
 ### Pulse Sensor
 
 ### Humidity and Temperature Sensor

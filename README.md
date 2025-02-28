@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="Documents/pictures/EAEM-Logo.png"/ width=350>
+    <img src="Documents/pictures/EAEM-Logo.png"/ width=300>
     <p>
       <i align="center">An ECG-Assisted Emotion Monitoring System that captures facial expressions via a camera and extracts micro-expression features using image recognition. By integrating ECG signals, the system aims for precise emotion assessment, enhancing mental health monitoring and awareness.🫀</i>
     </p>

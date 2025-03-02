@@ -35,6 +35,7 @@ else()
         interface/sensor_aht20.h interface/sensor_aht20.cpp
         interface/ecg_hrv.h interface/ecg_hrv.cpp
         interface/temperature_humidity.h interface/temperature_humidity.cpp
+        driver/i2c_driver.h driver/i2c_driver.cpp
     )
 endif()
 

@@ -10,8 +10,11 @@ void DashboardWidget::initUI() {
     groupBox_Dashboard->setGeometry(10, 20, 960, 65);
 
     // Create buttons
-    QPushButton *pushButton_start_emotion_detection = new QPushButton("Start Emotion Detection");
-    QPushButton *pushButton_stop_emotion_detection = new QPushButton("Stop Emotion Detection");
+    pushButton_start_emotion_detection = new QPushButton("Start Emotion Detection");
+    connect(pushButton_start_emotion_detection, &QPushButton::clicked, this, &DashboardWidget::sig_emotion_detection_start);
+
+    pushButton_stop_emotion_detection = new QPushButton("Stop Emotion Detection");
+    connect(pushButton_stop_emotion_detection, &QPushButton::clicked, this, &DashboardWidget::sig_emotion_detection_stop);
 
     // Create labels for system date and time
     QLabel *label_system_date = new QLabel();

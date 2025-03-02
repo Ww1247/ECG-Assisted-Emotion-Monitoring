@@ -11,6 +11,17 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    UI_SetUp();
+}
+
+MainWindow::~MainWindow()
+{
+    // No need to delete UI here, as it is handled by Qt's parent-child memory management
+    qDebug() << "Windows Closed.";
+}
+
+void MainWindow::UI_SetUp()
+{
     setWindowTitle("Emotion Detection System");
     resize(980, 1044);
 
@@ -58,10 +69,4 @@ MainWindow::MainWindow(QWidget *parent)
     centralWidget->setLayout(mainLayout);
     setCentralWidget(centralWidget);
     setStatusBar(new QStatusBar(this));
-}
-
-MainWindow::~MainWindow()
-{
-    // No need to delete UI here, as it is handled by Qt's parent-child memory management
-    qDebug() << "Windows Closed.";
 }

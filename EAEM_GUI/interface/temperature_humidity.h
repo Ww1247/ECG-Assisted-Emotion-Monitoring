@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QGridLayout>
 #include <QFrame>
+#include "qcustomplot.h"
 
 class TemperatureHumidityWidget : public QWidget {
     Q_OBJECT
@@ -15,6 +16,7 @@ public:
 
 private:
     void initUI();
+    void setupPlot(QCustomPlot *plot);
 };
 
 #endif // TEMPERATURE_HUMIDITY_H

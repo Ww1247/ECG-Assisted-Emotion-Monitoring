@@ -20,10 +20,21 @@ void EcgHrvWidget::initUI() {
     horizontalLayout_ECG_config->addWidget(radioButton_avg_heart_rate_display);
     horizontalLayout_ECG_config->addSpacerItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
-    // ECG Display Frame
+    // ECG Display Frame with QCustomPlot
     QFrame *frame_ECG = new QFrame;
     frame_ECG->setMinimumSize(450, 150);
     frame_ECG->setFrameShape(QFrame::Box);
+
+    QVBoxLayout *layout_ECG = new QVBoxLayout(frame_ECG);
+    layout_ECG->setContentsMargins(0, 0, 0, 0); // Remove margins
+    layout_ECG->setSpacing(0); // Remove spacing
+
+    QCustomPlot *customPlot_ECG = new QCustomPlot(frame_ECG);
+    frame_ECG->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout_ECG->addWidget(customPlot_ECG);
+
+    // Initialize ECG Plot
+    setupPlot(customPlot_ECG);
 
     QVBoxLayout *verticalLayout_ECG = new QVBoxLayout;
     verticalLayout_ECG->addLayout(horizontalLayout_ECG_config);
@@ -46,10 +57,21 @@ void EcgHrvWidget::initUI() {
     horizontalLayout_HRV_config->addWidget(radioButton_HRV_LF_HF);
     horizontalLayout_HRV_config->addSpacerItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
-    // HRV Display Frame
+    // HRV Display Frame with QCustomPlot
     QFrame *frame_HRV = new QFrame;
     frame_HRV->setMinimumSize(450, 150);
     frame_HRV->setFrameShape(QFrame::Box);
+
+    QVBoxLayout *layout_HRV = new QVBoxLayout(frame_HRV);
+    layout_HRV->setContentsMargins(0, 0, 0, 0); // Remove margins
+    layout_HRV->setSpacing(0); // Remove spacing
+
+    QCustomPlot *customPlot_HRV = new QCustomPlot(frame_HRV);
+    frame_HRV->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout_HRV->addWidget(customPlot_HRV);
+
+    // Initialize HRV Plot
+    setupPlot(customPlot_HRV);
 
     QVBoxLayout *verticalLayout_HRV = new QVBoxLayout;
     verticalLayout_HRV->addLayout(horizontalLayout_HRV_config);
@@ -63,4 +85,13 @@ void EcgHrvWidget::initUI() {
     horizontalLayout_MAX30102->addWidget(groupBox_HRV);
 
     setLayout(horizontalLayout_MAX30102);
+}
+
+// Function to initialize QCustomPlot settings
+void EcgHrvWidget::setupPlot(QCustomPlot *plot) {
+    plot->addGraph();
+    plot->graph(0)->setPen(QPen(Qt::blue));  // Line color
+
+    plot->xAxis->setRange(0, 10);
+    plot->yAxis->setRange(-1, 1);
 }

@@ -16,7 +16,7 @@ public:
     ~MainWindow();
 
 private:
-
+    void UI_SetUp();
 };
 
 #endif // MAINWINDOW_H

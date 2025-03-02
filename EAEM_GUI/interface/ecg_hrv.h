@@ -9,6 +9,8 @@
 #include <QRadioButton>
 #include <QFrame>
 #include <QSpacerItem>
+#include "qcustomplot.h"
+
 
 class EcgHrvWidget : public QWidget {
     Q_OBJECT
@@ -17,6 +19,7 @@ public:
 
 private:
     void initUI();
+    void setupPlot(QCustomPlot *plot);
 };
 
 #endif // ECG_HRV_H

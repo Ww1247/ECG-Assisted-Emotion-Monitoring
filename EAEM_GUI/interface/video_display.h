@@ -14,8 +14,17 @@ class VideoDisplayWidget : public QWidget {
 public:
     explicit VideoDisplayWidget(QWidget *parent = nullptr);
 
+
 private:
+    QComboBox *comboBox_resolution;
+    QComboBox *comboBox_video_fps;
+
     void initUI();
+
+private slots:
+    void on_comboBox_resolution_currentIndexChanged(int index);
+    void on_comboBox_video_fps_currentIndexChanged(int index);
+
 };
 
 #endif // VIDEODISPLAY_H

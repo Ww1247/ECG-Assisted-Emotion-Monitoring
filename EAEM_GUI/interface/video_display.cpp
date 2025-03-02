@@ -1,4 +1,5 @@
 #include "video_display.h"
+#include <QDebug>
 
 VideoDisplayWidget::VideoDisplayWidget(QWidget *parent) : QWidget(parent) {
     initUI();
@@ -14,15 +15,17 @@ void VideoDisplayWidget::initUI() {
 
     // Resolution selection
     QLabel *label_resolution = new QLabel("Resolution:");
-    QComboBox *comboBox_resolution = new QComboBox;
+    comboBox_resolution = new QComboBox(this);
     comboBox_resolution->addItem("800x600");
     comboBox_resolution->addItem("1024x720");
+    connect(comboBox_resolution, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &VideoDisplayWidget::on_comboBox_resolution_currentIndexChanged);
 
     // Frame rate selection
     QLabel *label_video_fps = new QLabel("FPS:");
-    QComboBox *comboBox_video_fps = new QComboBox;
+    QComboBox *comboBox_video_fps = new QComboBox(this);
     comboBox_video_fps->addItem("30");
     comboBox_video_fps->addItem("60");
+    connect(comboBox_video_fps, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &VideoDisplayWidget::on_comboBox_video_fps_currentIndexChanged);
 
     // Horizontal layout: resolution & frame rate
     QHBoxLayout *horizontalLayout_video_resolution = new QHBoxLayout;
@@ -51,4 +54,14 @@ void VideoDisplayWidget::initUI() {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(groupBox_video_display);
     setLayout(mainLayout);
+}
+
+void VideoDisplayWidget::on_comboBox_resolution_currentIndexChanged(int index)
+{
+    qDebug() << "Video Index" << index;
+}
+
+void VideoDisplayWidget::on_comboBox_video_fps_currentIndexChanged(int index)
+{
+    qDebug() << "Video FPS" << index;
 }

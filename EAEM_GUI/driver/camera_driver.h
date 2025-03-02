@@ -6,13 +6,13 @@
 #include <QImage>
 #include <opencv2/opencv.hpp>
 
-class CameraThread : public QThread
+class CameraDriver : public QThread
 {
     Q_OBJECT
 
 public:
-    CameraThread(int cameraIndex = 0, int fps = 30, int width = 640, int height = 480, QObject *parent = nullptr);
-    ~CameraThread();
+    CameraDriver(int cameraIndex = 0, int fps = 30, int width = 640, int height = 480, QObject *parent = nullptr);
+    ~CameraDriver();
 
     void run() override;       // Thread execution function
     void stop();               // Stop the camera

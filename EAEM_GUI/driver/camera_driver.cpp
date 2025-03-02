@@ -1,33 +1,33 @@
-#include "CameraThread.h"
+#include "camera_driver.h"
 #include <QDebug>
 #include <QImage>
 #include <QMutex>
 
 // Constructor
-CameraThread::CameraThread(int cameraIndex, int fps, int width, int height, QObject *parent)
+CameraDriver::CameraDriver(int cameraIndex, int fps, int width, int height, QObject *parent)
     : QThread(parent), cameraIndex(cameraIndex), fps(fps), width(width), height(height), running(false) {}
 
 // Destructor
-CameraThread::~CameraThread()
+CameraDriver::~CameraDriver()
 {
     stop();
 }
 
 // Set frame rate
-void CameraThread::setFPS(int fps)
+void CameraDriver::setFPS(int fps)
 {
     this->fps = fps;
 }
 
 // Set resolution
-void CameraThread::setResolution(int width, int height)
+void CameraDriver::setResolution(int width, int height)
 {
     this->width = width;
     this->height = height;
 }
 
 // Run thread
-void CameraThread::run()
+void CameraDriver::run()
 {
     cap.open(cameraIndex);
     if (!cap.isOpened()) {
@@ -59,7 +59,7 @@ void CameraThread::run()
 }
 
 // Stop thread
-void CameraThread::stop()
+void CameraDriver::stop()
 {
     running = false;
     wait();

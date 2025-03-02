@@ -1,36 +1,34 @@
-#ifndef CAMERA_CAPTURE_H
-#define CAMERA_CAPTURE_H
+#ifndef CAMERATHREAD_H
+#define CAMERATHREAD_H
 
 #include <QObject>
 #include <QThread>
 #include <QImage>
-#include <QMutex>
 #include <opencv2/opencv.hpp>
 
-class CameraCapture : public QObject {
+class CameraThread : public QThread
+{
     Q_OBJECT
-public:
-    explicit CameraCapture(QObject *parent = nullptr);
-    ~CameraCapture();
 
-    void start(int cameraIndex = 0);
-    void stop();
-    void setResolution(int width, int height);
-    void setFPS(int fps);
+public:
+    CameraThread(int cameraIndex = 0, int fps = 30, int width = 640, int height = 480, QObject *parent = nullptr);
+    ~CameraThread();
+
+    void run() override;       // 线程执行函数
+    void stop();               // 停止摄像头
+    void setFPS(int fps);      // 设置帧率
+    void setResolution(int width, int height); // 设置分辨率
 
 signals:
-    void frameReady(const QImage &frame);
+    void frameReady(const QImage &frame);  // 发送处理后的帧
 
 private:
-    void captureLoop();
-
-    QThread *captureThread;
     cv::VideoCapture cap;
-    QMutex mutex;
+    int cameraIndex;
+    int fps;
+    int width;
+    int height;
     bool running;
-    int frameWidth;
-    int frameHeight;
-    int targetFPS;
 };
 
-#endif // CAMERA_CAPTURE_H
+#endif // CAMERATHREAD_H

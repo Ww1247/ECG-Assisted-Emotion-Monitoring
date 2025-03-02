@@ -7,9 +7,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
-# Find Qt5 or Qt6
+# Find Package
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets PrintSupport)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets PrintSupport)
+find_package(OpenCV REQUIRED)
+
+# Find Library
+find_library(PIGPIO_LIB NAMES pigpio REQUIRED)
 
 # Project source files
 set(PROJECT_SOURCES
@@ -36,6 +40,7 @@ else()
         interface/ecg_hrv.h interface/ecg_hrv.cpp
         interface/temperature_humidity.h interface/temperature_humidity.cpp
         driver/i2c_driver.h driver/i2c_driver.cpp
+        driver/camera_driver.h driver/camera_driver.cpp
     )
 endif()
 
@@ -48,7 +53,9 @@ target_include_directories(EAEM_GUI PRIVATE
 # Link Qt Widgets library
 target_link_libraries(EAEM_GUI PRIVATE
         Qt${QT_VERSION_MAJOR}::Widgets
-        Qt${QT_VERSION_MAJOR}::PrintSupport)
+        Qt${QT_VERSION_MAJOR}::PrintSupport
+        PRIVATE ${OpenCV_LIBS}
+        PRIVATE ${PIGPIO_LIBS})
 
 # Install settings
 include(GNUInstallDirs)

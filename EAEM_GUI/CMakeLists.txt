@@ -25,14 +25,22 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 else()
     add_executable(EAEM_GUI
         ${PROJECT_SOURCES}
-        interface/plot_driver.h interface/plot_driver.cpp
-        interface/qcustomplot.h interface/qcustomplot.cpp
+        driver/plot_driver.h driver/plot_driver.cpp
+        driver/qcustomplot.h driver/qcustomplot.cpp
         interface/mainwindow.h interface/mainwindow.cpp
+        interface/dashboard.h interface/dashboard.cpp
+        interface/video_display.h interface/video_display.cpp
+        interface/emotion_indicator.h interface/emotion_indicator.cpp
+        interface/sensor_max30102.h interface/sensor_max30102.cpp
+        interface/sensor_aht20.h interface/sensor_aht20.cpp
+        interface/ecg_hrv.h interface/ecg_hrv.cpp
+        interface/temperature_humidity.h interface/temperature_humidity.cpp
     )
 endif()
 
 # Add directories to the include path.
 target_include_directories(EAEM_GUI PRIVATE
+        ${CMAKE_SOURCE_DIR}/driver
         ${CMAKE_SOURCE_DIR}/interface
 )
 

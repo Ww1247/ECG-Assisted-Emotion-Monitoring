@@ -1,54 +1,72 @@
 #include "mainwindow.h"
 #include <QDebug>
-
+#include "dashboard.h"
+#include "video_display.h"
+#include "emotion_indicator.h"
+#include "sensor_max30102.h"
+#include "sensor_aht20.h"
+#include "ecg_hrv.h"
+#include "temperature_humidity.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    // Setting the geometric properties of the main window
-    setGeometry(0, 0, 850, 850);
-    setWindowTitle("EAEM_GUI");
-
-    // Creating Centre Controls
-    QWidget *centralWidget = new QWidget(this);
-    setCentralWidget(centralWidget);
-
-    // Creating a central layout
-    QGridLayout *centralLayout = new QGridLayout(centralWidget);
-
-    // Creating a Connection Group Box
-    QGroupBox *groupBoxConnection = new QGroupBox("Connection", centralWidget);
-    QVBoxLayout *connectionLayout = new QVBoxLayout(groupBoxConnection);
-    QGridLayout *connectionGridLayout = new QGridLayout();
-
-    // Creating a QStackedWidget for connection method switching
-    QStackedWidget *stackedWidgetConnectMethod = new QStackedWidget(groupBoxConnection);
-    stackedWidgetConnectMethod->setCurrentIndex(0);
-
-
-    // // Set up the main window
-    // setWindowTitle("Manual UI Example");
-    // resize(400, 300);
-
-    // // Create the button
-    // button = new QPushButton("Click Me", this);
-    // button->setGeometry(150, 120, 100, 50);  // Position and size of the button
-
-    // // Create a layout
-    // QVBoxLayout *layout = new QVBoxLayout();
-    // layout->addWidget(button);
-
-    // // Create a central widget to hold the layout
-    // QWidget *centralWidget = new QWidget(this);
-    // centralWidget->setLayout(layout);
-    // setCentralWidget(centralWidget);
-
-    // // Connect the button's clicked signal to the application's quit function
-    // connect(button, &QPushButton::clicked, qApp, &QCoreApplication::quit);
+    UI_SetUp();
 }
 
 MainWindow::~MainWindow()
 {
     // No need to delete UI here, as it is handled by Qt's parent-child memory management
     qDebug() << "Windows Closed.";
+}
+
+void MainWindow::UI_SetUp()
+{
+    setWindowTitle("Emotion Detection System");
+    resize(980, 1044);
+
+    QWidget *centralWidget = new QWidget(this);
+    QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
+
+    // Dashboard Module
+    DashboardWidget *dashboard = new DashboardWidget(this);
+    mainLayout->addWidget(dashboard,0);
+
+    // Main Control Layout
+    QHBoxLayout *horizontalLayout_Controler = new QHBoxLayout;
+
+    // Video Display Module
+    VideoDisplayWidget *videoDisplay = new VideoDisplayWidget(this);
+    horizontalLayout_Controler->addWidget(videoDisplay,1);
+
+    // Right Side Layout for Emotion Indicator and Sensors
+    QVBoxLayout *verticalLayout_Sensors = new QVBoxLayout;
+
+    // Emotion Indicator Module
+    EmotionIndicatorWidget *emotionIndicator = new EmotionIndicatorWidget(this);
+    verticalLayout_Sensors->addWidget(emotionIndicator,0);
+
+    // MAX30102 Sensor Module
+    SensorMAX30102Widget *sensorMAX30102 = new SensorMAX30102Widget(this);
+    verticalLayout_Sensors->addWidget(sensorMAX30102,1);
+
+    // AHT20 Sensor Module
+    SensorAHT20Widget *sensorAHT20 = new SensorAHT20Widget(this);
+    verticalLayout_Sensors->addWidget(sensorAHT20,1);
+
+    horizontalLayout_Controler->addLayout(verticalLayout_Sensors,1);
+    mainLayout->addLayout(horizontalLayout_Controler,0);
+
+    // ECG & HRV Module
+    EcgHrvWidget *ecg_hrv = new EcgHrvWidget(this);
+    mainLayout->addWidget(ecg_hrv,1);
+
+    // Temperature & Humidity Module
+    TemperatureHumidityWidget *temperatureHumidity = new TemperatureHumidityWidget(this);
+    mainLayout->addWidget(temperatureHumidity,1);
+
+    // Set Layout and Central Widget
+    centralWidget->setLayout(mainLayout);
+    setCentralWidget(centralWidget);
+    setStatusBar(new QStatusBar(this));
 }

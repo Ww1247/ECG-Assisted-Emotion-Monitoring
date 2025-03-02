@@ -1,72 +1,66 @@
-#include "camera_capture.h"
-#include <QImage>
+#include "CameraThread.h"
 #include <QDebug>
-#include <chrono>
-#include <thread>
+#include <QImage>
+#include <QMutex>
 
-CameraCapture::CameraCapture(QObject *parent)
-    : QObject(parent), running(false), frameWidth(640), frameHeight(480), targetFPS(30) {}
+// Constructor
+CameraThread::CameraThread(int cameraIndex, int fps, int width, int height, QObject *parent)
+    : QThread(parent), cameraIndex(cameraIndex), fps(fps), width(width), height(height), running(false) {}
 
-CameraCapture::~CameraCapture() {
+// Destructor
+CameraThread::~CameraThread()
+{
     stop();
 }
 
-void CameraCapture::start(int cameraIndex) {
-    if (running) return;
-    running = true;
-    captureThread = QThread::create([this, cameraIndex]() { captureLoop(); });
-    captureThread->start();
+// Set frame rate
+void CameraThread::setFPS(int fps)
+{
+    this->fps = fps;
 }
 
-void CameraCapture::stop() {
-    running = false;
-    if (captureThread && captureThread->isRunning()) {
-        captureThread->quit();
-        captureThread->wait();
+// Set resolution
+void CameraThread::setResolution(int width, int height)
+{
+    this->width = width;
+    this->height = height;
+}
+
+// Run thread
+void CameraThread::run()
+{
+    cap.open(cameraIndex);
+    if (!cap.isOpened()) {
+        qDebug() << "Error: Cannot open camera!";
+        return;
+    }
+    cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
+    cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+    cap.set(cv::CAP_PROP_FPS, fps);
+
+    running = true;
+    while (running) {
+        cv::Mat frame;
+        cap >> frame;
+        if (frame.empty()) {
+            continue;
+        }
+
+        // Convert OpenCV Mat to QImage
+        cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
+        QImage image(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+
+        // Emit signal to UI thread
+        emit frameReady(image);
+
+        QThread::msleep(1000 / fps);  // Control frame rate
     }
     cap.release();
 }
 
-void CameraCapture::setResolution(int width, int height) {
-    QMutexLocker locker(&mutex);
-    frameWidth = width;
-    frameHeight = height;
-    if (cap.isOpened()) {
-        cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
-        cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
-    }
-}
-
-void CameraCapture::setFPS(int fps) {
-    QMutexLocker locker(&mutex);
-    targetFPS = fps;
-    if (cap.isOpened()) {
-        cap.set(cv::CAP_PROP_FPS, fps);
-    }
-}
-
-void CameraCapture::captureLoop() {
-    cap.open(0);
-    if (!cap.isOpened()) {
-        qDebug() << "Failed to open camera";
-        return;
-    }
-    cap.set(cv::CAP_PROP_FRAME_WIDTH, frameWidth);
-    cap.set(cv::CAP_PROP_FRAME_HEIGHT, frameHeight);
-    cap.set(cv::CAP_PROP_FPS, targetFPS);
-
-    while (running) {
-        auto startTime = std::chrono::steady_clock::now();
-        
-        cv::Mat frame;
-        cap >> frame;
-        if (frame.empty()) continue;
-        
-        cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
-        QImage image(frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
-        emit frameReady(image.copy());
-        
-        auto endTime = std::chrono::steady_clock::now();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / targetFPS) - (endTime - startTime));
-    }
+// Stop thread
+void CameraThread::stop()
+{
+    running = false;
+    wait();
 }

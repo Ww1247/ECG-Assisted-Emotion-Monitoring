@@ -14,13 +14,13 @@ public:
     CameraThread(int cameraIndex = 0, int fps = 30, int width = 640, int height = 480, QObject *parent = nullptr);
     ~CameraThread();
 
-    void run() override;       // 线程执行函数
-    void stop();               // 停止摄像头
-    void setFPS(int fps);      // 设置帧率
-    void setResolution(int width, int height); // 设置分辨率
+    void run() override;       // Thread execution function
+    void stop();               // Stop the camera
+    void setFPS(int fps);      // Set the frame rate
+    void setResolution(int width, int height); // Set the resolution
 
 signals:
-    void frameReady(const QImage &frame);  // 发送处理后的帧
+    void frameReady(const QImage &frame);  // Signal to send processed frames
 
 private:
     cv::VideoCapture cap;

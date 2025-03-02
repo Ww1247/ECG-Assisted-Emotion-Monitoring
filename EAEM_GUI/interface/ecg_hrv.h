@@ -19,7 +19,7 @@ public:
 
 private:
     void initUI();
-    void setupPlot(QCustomPlot *customPlot, double yMin, double yMax, const QString &yLabel);
+    void setupPlot(QCustomPlot *plot, double yMin, double yMax, const QString &yLabel);
 };
 
 #endif // ECG_HRV_H

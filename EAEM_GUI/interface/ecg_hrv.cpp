@@ -34,7 +34,7 @@ void EcgHrvWidget::initUI() {
     layout_ECG->addWidget(customPlot_ECG);
 
     // Initialize ECG Plot
-    setupPlot(customPlot_ECG, 0,100,"");
+    setupPlot(customPlot_ECG, 0, 100, "");
 
     QVBoxLayout *verticalLayout_ECG = new QVBoxLayout;
     verticalLayout_ECG->addLayout(horizontalLayout_ECG_config);
@@ -71,7 +71,7 @@ void EcgHrvWidget::initUI() {
     layout_HRV->addWidget(customPlot_HRV);
 
     // Initialize HRV Plot
-    setupPlot(customPlot_HRV,0,100,"");
+    setupPlot(customPlot_HRV, 0, 100, "");
 
     QVBoxLayout *verticalLayout_HRV = new QVBoxLayout;
     verticalLayout_HRV->addLayout(horizontalLayout_HRV_config);
@@ -88,46 +88,46 @@ void EcgHrvWidget::initUI() {
 }
 
 // Function to initialize QCustomPlot settings
-void EcgHrvWidget::setupPlot(QCustomPlot *customPlot, double yMin, double yMax, const QString &yLabel) {
+void EcgHrvWidget::setupPlot(QCustomPlot *plot, double yMin, double yMax, const QString &yLabel) {
     // Add a graph to the customPlot and store it in the graph pointer
-    customPlot->addGraph(); // Ensure graph is a QCPGraph*
-    customPlot->graph(0)->setPen(QPen(Qt::green, 2)); // Set line color and thickness
+    plot->addGraph(); // Ensure graph is a QCPGraph*
+    plot->graph(0)->setPen(QPen(Qt::green, 2)); // Set line color and thickness
 
     // Configure X axis (time in milliseconds)
-    customPlot->xAxis->setTickLabels(false);
-    customPlot->xAxis->setBasePen(QPen(Qt::white));
-    customPlot->xAxis->setTickPen(QPen(Qt::white));
-    customPlot->xAxis->setSubTickPen(QPen(Qt::white));
-    customPlot->xAxis->setTickLabelColor(Qt::white); // Set X-axis tick color
-    customPlot->xAxis->setLabel("Time (ms)"); // Set X-axis label
-    customPlot->xAxis->setLabelColor(Qt::white); // Set X-axis label color
+    plot->xAxis->setTickLabels(false);
+    plot->xAxis->setBasePen(QPen(Qt::white));
+    plot->xAxis->setTickPen(QPen(Qt::white));
+    plot->xAxis->setSubTickPen(QPen(Qt::white));
+    plot->xAxis->setTickLabelColor(Qt::white); // Set X-axis tick color
+    plot->xAxis->setLabel("Time (ms)"); // Set X-axis label
+    plot->xAxis->setLabelColor(Qt::white); // Set X-axis label color
 
     // Configure Y axis
-    customPlot->yAxis->setRange(yMin, yMax);
-    customPlot->yAxis->setTickLabels(true);
-    customPlot->yAxis->setNumberPrecision(2);
-    customPlot->yAxis->ticker()->setTickCount(5); // Control tick count
-    customPlot->yAxis->setLabel(yLabel); // Set Y-axis label
-    customPlot->yAxis->setLabelColor(Qt::white); // Set Y-axis label color
-    customPlot->yAxis->setBasePen(QPen(Qt::white));
-    customPlot->yAxis->setTickPen(QPen(Qt::white));
-    customPlot->yAxis->setSubTickPen(QPen(Qt::white));
-    customPlot->yAxis->setTickLabelColor(Qt::white); // Set tick label color
+    plot->yAxis->setRange(yMin, yMax);
+    plot->yAxis->setTickLabels(true);
+    plot->yAxis->setNumberPrecision(2);
+    plot->yAxis->ticker()->setTickCount(5); // Control tick count
+    plot->yAxis->setLabel(yLabel); // Set Y-axis label
+    plot->yAxis->setLabelColor(Qt::white); // Set Y-axis label color
+    plot->yAxis->setBasePen(QPen(Qt::white));
+    plot->yAxis->setTickPen(QPen(Qt::white));
+    plot->yAxis->setSubTickPen(QPen(Qt::white));
+    plot->yAxis->setTickLabelColor(Qt::white); // Set tick label color
 
     // Set background color
-    customPlot->setBackground(QBrush(Qt::black));
+    plot->setBackground(QBrush(Qt::black));
 
     // Disable grid lines
-    customPlot->xAxis->grid()->setVisible(false);
-    customPlot->yAxis->grid()->setVisible(false);
+    plot->xAxis->grid()->setVisible(false);
+    plot->yAxis->grid()->setVisible(false);
 
     // Enable user interactions for zooming and panning
-    customPlot->setInteraction(QCP::iRangeDrag, true);
-    customPlot->setInteraction(QCP::iRangeZoom, true);
+    plot->setInteraction(QCP::iRangeDrag, true);
+    plot->setInteraction(QCP::iRangeZoom, true);
 
     // Prevent the view from resetting during data updates
     // customPlot->axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
     // customPlot->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
-    customPlot->axisRect()->setRangeZoom(Qt::Horizontal);
-    customPlot->axisRect()->setRangeDrag(Qt::Horizontal);
+    plot->axisRect()->setRangeZoom(Qt::Horizontal);
+    plot->axisRect()->setRangeDrag(Qt::Horizontal);
 }

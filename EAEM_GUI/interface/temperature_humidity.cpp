@@ -68,6 +68,21 @@ void TemperatureHumidityWidget::setupPlot(QCustomPlot *plot) {
     plot->addGraph();
     plot->graph(0)->setPen(QPen(Qt::red));  // Set plot line color
 
-    plot->xAxis->setRange(0, 10);
+     // Configure X axis (time in milliseconds)
+    plot->xAxis->setTickLabels(false);
+    plot->xAxis->setLabel("Time (ms)"); // Set X-axis label
+
+    // Configure Y axis
+    plot->yAxis->setTickLabels(true);
     plot->yAxis->setRange(0, 100);
+
+    // Enable user interactions for zooming and panning
+    plot->setInteraction(QCP::iRangeDrag, true);
+    plot->setInteraction(QCP::iRangeZoom, true);
+
+    // Prevent the view from resetting during data updates
+    // customPlot->axisRect()->setRangeZoom(Qt::Horizontal | Qt::Vertical);
+    // customPlot->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
+    plot->axisRect()->setRangeZoom(Qt::Horizontal);
+    plot->axisRect()->setRangeDrag(Qt::Horizontal);
 }

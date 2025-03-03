@@ -44,7 +44,6 @@ else()
         interface/ecg_hrv.h interface/ecg_hrv.cpp
         interface/temperature_humidity.h interface/temperature_humidity.cpp
         module/camera_capture.h module/camera_capture.cpp
-        module/sensor_manager.h module/sensor_manager.cpp
         sensors/max30102.h sensors/max30102.cpp
         sensors/aht20.h sensors/aht20.cpp
     )

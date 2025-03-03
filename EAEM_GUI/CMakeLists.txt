@@ -31,10 +31,12 @@ else()
         ${PROJECT_SOURCES}
         arithmetic/facial_analyzer.h arithmetic/facial_analyzer.cpp
         arithmetic/ecg_analyzer.h arithmetic/ecg_analyzer.cpp
+
         driver/plot_driver.h driver/plot_driver.cpp
         driver/qcustomplot.h driver/qcustomplot.cpp
         driver/i2c_driver.h driver/i2c_driver.cpp
         driver/camera_driver.h driver/camera_driver.cpp
+
         interface/mainwindow.h interface/mainwindow.cpp
         interface/dashboard.h interface/dashboard.cpp
         interface/video_display.h interface/video_display.cpp
@@ -43,10 +45,11 @@ else()
         interface/sensor_aht20.h interface/sensor_aht20.cpp
         interface/ecg_hrv.h interface/ecg_hrv.cpp
         interface/temperature_humidity.h interface/temperature_humidity.cpp
+
         module/camera_capture.h module/camera_capture.cpp
-        sensors/max30102.h sensors/max30102.cpp
+
         sensors/aht20.h sensors/aht20.cpp
-        sensors/sensor_factory.h sensors/sensor_factory.cpp
+        sensors/max30102.h sensors/max30102.cpp
     )
 endif()
 

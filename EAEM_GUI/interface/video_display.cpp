@@ -2,10 +2,10 @@
 #include <QDebug>
 
 VideoDisplayWidget::VideoDisplayWidget(QWidget *parent) : QWidget(parent) {
-    initUI();
     camera_capture = new CameraCapture(this);
     connect(camera_capture, &CameraCapture::frameReady, this, &VideoDisplayWidget::updateFrame);
     camera_capture->start();
+    initUI();
 }
 
 VideoDisplayWidget::~VideoDisplayWidget()

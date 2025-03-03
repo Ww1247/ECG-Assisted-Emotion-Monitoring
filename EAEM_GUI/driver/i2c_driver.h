@@ -5,7 +5,6 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QByteArray>
-#include <QMap>
 #include <pigpio.h>
 
 /**
@@ -19,11 +18,18 @@ class I2CDriver : public QObject
     Q_OBJECT
 
 public:
+
     /**
      * @brief Constructs an I2CDriver object.
      * @param deviceAddress The I2C device address.
      */
-    static I2CDriver* getInstance (int deviceAddresss);
+    explicit I2CDriver(int deviceAddress, QObject *parent = nullptr);
+
+    /**
+     * @brief Destructs the I2CDriver object.
+     * Closes the I2C handle.
+     */
+    ~I2CDriver();
 
     /**
      * @brief Initializes the I2C device.
@@ -51,7 +57,7 @@ public:
      * @param values The data to write.
      * @return true if successful, false otherwise.
      */
-    bool writeBytes(quint8 reg, const QVector<quint8> &values);
+    bool writeBytes(quint8 reg, const QByteArray &values);
 
     /**
      * @brief Reads a byte from the specified register.
@@ -70,16 +76,8 @@ public:
     QByteArray readBytes(quint8 reg, quint8 count);
 
 private:
-    static QMap<int, I2CDriver*> instances;
+
     static QMutex i2cMutex_;     ///< Qt thread lock to ensure thread safety in I2C operations
-    explicit I2CDriver(int deviceAddress, QObject *parent = nullptr);
-
-    /**
-     * @brief Destructs the I2CDriver object.
-     * Closes the I2C handle.
-     */
-    ~I2CDriver();
-
     int i2cHandle_;       ///< I2C handle returned by pigpio
     int deviceAddress_;   ///< I2C device address
 
@@ -91,7 +89,8 @@ private:
     QString intToHex(int value);
 
 signals:
-    void errorOccurred(const QString &error);
+
+    void errorOccurred(const QString &error_message);
 };
 
 #endif // I2C_DRIVER_H

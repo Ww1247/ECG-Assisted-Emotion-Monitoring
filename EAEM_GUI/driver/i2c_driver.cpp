@@ -1,15 +1,15 @@
 #include "i2c_driver.h"
-
 #include <QDebug>
 
-QMap<int, I2CDriver*> I2CDriver::instances;
 QMutex I2CDriver::i2cMutex_;
 
 I2CDriver::I2CDriver(int deviceAddress, QObject *parent)
     : QObject(parent),
       deviceAddress_(deviceAddress),
       i2cHandle_(-1)
-{}
+{
+    initialize();
+}
 
 I2CDriver::~I2CDriver()
 {
@@ -19,14 +19,6 @@ I2CDriver::~I2CDriver()
     }
 }
 
-I2CDriver* I2CDriver::getInstance(int deviceAddress) {
-    QMutexLocker locker(&mutex);
-    if (!instances.contains(deviceAddress)) {
-        instances[deviceAddress] = new I2CDriver(deviceAddress);
-    }
-    return instances[deviceAddress];
-}
-
 bool I2CDriver::initialize()
 {
     // Ensure pigpio is initialized externally.
@@ -34,7 +26,7 @@ bool I2CDriver::initialize()
     // Open the I2C bus on bus 1 with the specified device address.
     i2cHandle_ = i2cOpen(1, deviceAddress_, 0);
     if (i2cHandle_ < 0) {
-        qDebug() << "[ERROR]: Failed to open I2C device:" << deviceAddress_;
+        qDebug() << "[ERROR]: Failed to open I2C device:" << intToHex(deviceAddress_);
         emit errorOccurred("Failed to Open I2C Device" + intToHex(deviceAddress_));
         return false;
     }
@@ -67,10 +59,10 @@ bool I2CDriver::writeByte(quint8 reg, quint8 value)
     return true;
 }
 
-bool I2CDriver::writeBytes(quint8 reg, const QVector<quint8> &values)
+bool I2CDriver::writeBytes(quint8 reg, const QByteArray &values)
 {
     QMutexLocker locker(&i2cMutex_);
-    int result = i2cWriteI2CBlockData(i2cHandle_, reg, reinterpret_cast<char*>(const_cast<quint8*>(values.data())), values.size());
+    int result = i2cWriteI2CBlockData(i2cHandle_, reg, const_cast<char*>(values.data()), values.size());
     if (result < 0) {
         // qDebug() << "[LOG]: Written bytes to register" << intToHex(reg) << ", Value:" << values.size() << "bytes.";
         emit errorOccurred("Failed to write bytes to I2C device at register " + intToHex(reg));

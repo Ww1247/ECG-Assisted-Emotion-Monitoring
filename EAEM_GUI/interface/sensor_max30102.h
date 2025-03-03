@@ -1,5 +1,5 @@
-#ifndef MAX30102_H
-#define MAX30102_H
+#ifndef SENSOR_MAX30102_H
+#define SENSOR_MAX30102_H
 
 #include <QWidget>
 #include <QGroupBox>
@@ -13,8 +13,11 @@
 #include <QSpacerItem>
 #include <QComboBox>
 
+#include "max30102.h"
+
 class SensorMAX30102Widget : public QWidget {
     Q_OBJECT
+
 public:
     explicit SensorMAX30102Widget(QWidget *parent = nullptr);
     bool sensorReadStart();
@@ -22,6 +25,7 @@ public:
 
 private:
     void initUI();
+
     // Combo boxes for sensor configuration
     QComboBox *comboBox_sampling_rate;
     QComboBox *comboBox_led_red;
@@ -48,4 +52,4 @@ signals:
     void sig_max30102_errorOccurred(const QString &error_message);
 };
 
-#endif // MAX30102_H
+#endif // SENSOR_MAX30102_H

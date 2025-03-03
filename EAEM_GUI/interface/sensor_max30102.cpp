@@ -1,11 +1,28 @@
 #include "sensor_max30102.h"
-#include <QDebug>
 
-SensorMAX30102Widget::SensorMAX30102Widget(QWidget *parent) : QWidget(parent) {
+#include <QDebug>
+#include <QThread>
+
+SensorMAX30102Widget::SensorMAX30102Widget(QWidget *parent) : QWidget(parent)
+{
     initUI();
+    MAX30102 *sensor = new MAX30102(0x57);
+    QThread *sensorThread = new QThread(this);
+    sensor->moveToThread(sensorThread);
+
+//    connect(, QOverload<int>::of(&QComboBox::currentIndexChanged),
+//               [=](int index){ sensor->setMode(static_cast<quint8>(index + 2)); });
+
+//    connect(ui->samplingRateSlider, &QSlider::valueChanged,
+//               [=](int value){ sensor->setSamplingRate(static_cast<quint8>(value)); });
+
+//    connect(ui->ledBrightnessSlider, &QSlider::valueChanged,
+//               [=](int value){ sensor->setLEDPulseAmplitude(static_cast<quint8>(value)); });
+
 }
 
-void SensorMAX30102Widget::initUI() {
+void SensorMAX30102Widget::initUI()
+{
     // Create a group box for the MAX30102 sensor
     QGroupBox *groupBox_sensor_max30102 = new QGroupBox("MAX30102", this);
     groupBox_sensor_max30102->setGeometry(120, 120, 624, 152);
@@ -117,17 +134,20 @@ void SensorMAX30102Widget::on_comboBox_led_ir_currentIndexChanged(int index)
 }
 
 // Slot function for heart rate slider value change
-void SensorMAX30102Widget::on_slider_heart_rate_changed(int value) {
+void SensorMAX30102Widget::on_slider_heart_rate_changed(int value)
+{
     qDebug() << "Heart Rate:" << value;
 }
 
 // Slot function for blood oxygen slider value change
-void SensorMAX30102Widget::on_slider_blood_oxygen_changed(int value) {
+void SensorMAX30102Widget::on_slider_blood_oxygen_changed(int value)
+{
     qDebug() << "Blood Oxygen:" << value << "%";
 }
 
 // Slot function to handle mode selection
-void SensorMAX30102Widget::on_checkBox_mode_changed(bool checked) {
+void SensorMAX30102Widget::on_checkBox_mode_changed(bool checked)
+{
     if (!checked) return;  // Ignore unchecked state
 
     if (checkBox_heart_rate_mode->isChecked()) {

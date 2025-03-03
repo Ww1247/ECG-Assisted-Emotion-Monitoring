@@ -41,7 +41,10 @@ else()
         interface/sensor_aht20.h interface/sensor_aht20.cpp
         interface/ecg_hrv.h interface/ecg_hrv.cpp
         interface/temperature_humidity.h interface/temperature_humidity.cpp
+        sensors/max30102.h sensors/max30102.cpp
+        sensors/aht20.h sensors/aht20.cpp
         module/camera_capture.h module/camera_capture.cpp
+        module/sensor_manager.h module/sensor_manager.cpp
     )
 endif()
 
@@ -50,6 +53,7 @@ target_include_directories(EAEM_GUI PRIVATE
         ${CMAKE_SOURCE_DIR}/driver
         ${CMAKE_SOURCE_DIR}/interface
         ${CMAKE_SOURCE_DIR}/module
+        ${CMAKE_SOURCE_DIR}/sensors
 )
 
 # Link Qt Widgets library

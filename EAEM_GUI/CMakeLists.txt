@@ -13,7 +13,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets PrintSupport)
 find_package(OpenCV REQUIRED)
 
 # Find Library
-find_library(PIGPIO_LIB NAMES pigpio REQUIRED)
+find_library(PIGPIO_LIBS NAMES pigpio REQUIRED)
 
 # Project source files
 set(PROJECT_SOURCES
@@ -63,8 +63,8 @@ target_include_directories(EAEM_GUI PRIVATE
 target_link_libraries(EAEM_GUI PRIVATE
         Qt${QT_VERSION_MAJOR}::Widgets
         Qt${QT_VERSION_MAJOR}::PrintSupport
-        PRIVATE ${OpenCV_LIBS}
-        PRIVATE ${PIGPIO_LIBS})
+        ${OpenCV_LIBS}
+        ${PIGPIO_LIBS})
 
 # Install settings
 include(GNUInstallDirs)

@@ -5,7 +5,13 @@
 
 // Constructor
 CameraDriver::CameraDriver(int cameraIndex, int fps, int width, int height, QObject *parent)
-    : QThread(parent), cameraIndex(cameraIndex), fps(fps), width(width), height(height), running(false) {}
+    : QThread(parent),
+      cameraIndex(cameraIndex),
+      fps(fps),
+      width(width),
+      height(height),
+      running(false)
+{}
 
 // Destructor
 CameraDriver::~CameraDriver()

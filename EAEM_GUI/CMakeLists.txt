@@ -29,7 +29,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 else()
     add_executable(EAEM_GUI
         ${PROJECT_SOURCES}
-
+        arithmetic/facial_analyzer.h arithmetic/facial_analyzer.cpp
+        arithmetic/ecg_analyzer.h arithmetic/ecg_analyzer.cpp
         driver/plot_driver.h driver/plot_driver.cpp
         driver/qcustomplot.h driver/qcustomplot.cpp
         driver/i2c_driver.h driver/i2c_driver.cpp

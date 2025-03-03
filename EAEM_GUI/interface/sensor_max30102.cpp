@@ -138,3 +138,15 @@ void SensorMAX30102Widget::on_checkBox_mode_changed(bool checked) {
         qDebug() << "Mixed Mode Selected";
     }
 }
+
+bool SensorMAX30102Widget::sensorReadStart()
+{
+    qDebug() << "MAX30102 Sensor Read Start.";
+    return true;
+}
+
+bool SensorMAX30102Widget::sensorReadStop()
+{
+    qDebug() << "MAX30102 Sensor Read Stop.";
+    return true;
+}

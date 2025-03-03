@@ -39,7 +39,7 @@ void MainWindow::UI_SetUp()
     QVBoxLayout *verticalLayout_Sensors = new QVBoxLayout;
 
     // Emotion Indicator Module
-    emotionIndicatorWidget = new EmotionIndicatorWidget(this);
+    emotionIndicatorWidget = new EmotionIndicatorWidget();
     verticalLayout_Sensors->addWidget(emotionIndicatorWidget,0);
 
     // MAX30102 Sensor Module
@@ -70,9 +70,17 @@ void MainWindow::UI_SetUp()
 void MainWindow::on_pushbutton_emotion_detection_start_clicked()
 {
     qDebug() << "System Start";
+    dashboardWidget->set_pushbuton_enable_start();
+    if (!sensorMAX30102Widget->sensorReadStart()) {
+        dashboardWidget->set_pushbuton_enable_stop();
+    }
 }
 
 void MainWindow::on_pushbutton_emotion_detection_stop_clicked()
 {
     qDebug() << "System Stop";
+    dashboardWidget->set_pushbuton_enable_stop();
+    if (!sensorMAX30102Widget->sensorReadStop()) {
+        dashboardWidget->set_pushbuton_enable_start();
+    }
 }

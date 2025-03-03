@@ -2,6 +2,7 @@
 
 #include <QDebug>
 
+QMap<int, I2CDriver*> I2CDriver::instances;
 QMutex I2CDriver::i2cMutex_;
 
 I2CDriver::I2CDriver(int deviceAddress, QObject *parent)
@@ -18,6 +19,14 @@ I2CDriver::~I2CDriver()
     }
 }
 
+I2CDriver* I2CDriver::getInstance(int deviceAddress) {
+    QMutexLocker locker(&mutex);
+    if (!instances.contains(deviceAddress)) {
+        instances[deviceAddress] = new I2CDriver(deviceAddress);
+    }
+    return instances[deviceAddress];
+}
+
 bool I2CDriver::initialize()
 {
     // Ensure pigpio is initialized externally.
@@ -26,7 +35,6 @@ bool I2CDriver::initialize()
     i2cHandle_ = i2cOpen(1, deviceAddress_, 0);
     if (i2cHandle_ < 0) {
         qDebug() << "[ERROR]: Failed to open I2C device:" << deviceAddress_;
-//         throw std::runtime_error("[ERROR]: Failed to open I2C device: " + intToHex(deviceAddress_).toStdString());
         emit errorOccurred("Failed to Open I2C Device" + intToHex(deviceAddress_));
         return false;
     }
@@ -51,34 +59,37 @@ bool I2CDriver::writeByte(quint8 reg, quint8 value)
 {
     QMutexLocker locker(&i2cMutex_);
     int result = i2cWriteByteData(i2cHandle_, reg, value);
-    if (result >= 0) {
+    if (result < 0) {
         // qDebug() << "[LOG]: Written byte to register" << intToHex(reg) << ", Value:" << intToHex(value);
-        return true;
+        emit errorOccurred("Failed to write byte to I2C device at register " + intToHex(reg));
+        return false;
     }
-    throw std::runtime_error("[ERROR]: Failed to write byte to I2C device at register " + intToHex(reg).toStdString());
+    return true;
 }
 
 bool I2CDriver::writeBytes(quint8 reg, const QVector<quint8> &values)
 {
     QMutexLocker locker(&i2cMutex_);
     int result = i2cWriteI2CBlockData(i2cHandle_, reg, reinterpret_cast<char*>(const_cast<quint8*>(values.data())), values.size());
-    if (result >= 0) {
+    if (result < 0) {
         // qDebug() << "[LOG]: Written bytes to register" << intToHex(reg) << ", Value:" << values.size() << "bytes.";
-        return true;
+        emit errorOccurred("Failed to write bytes to I2C device at register " + intToHex(reg));
+        return false;
     }
-    throw std::runtime_error("[ERROR]: Failed to write bytes to I2C device at register " + intToHex(reg).toStdString());
+    return true;
 }
 
 bool I2CDriver::readByte(quint8 reg, quint8 &value)
 {
     QMutexLocker locker(&i2cMutex_);
     int result = i2cReadByteData(i2cHandle_, reg);
-    if (result >= 0) {
+    if (result < 0) {
         value = static_cast<quint8>(result);
         // qDebug() << "[LOG]: Read byte from register" << intToHex(reg) << ", Value:" << intToHex(result);
-        return true;
+        emit errorOccurred("Failed to read byte from I2C device at register " + intToHex(reg));
+        return false;
     }
-    throw std::runtime_error("[ERROR]: Failed to read byte from I2C device at register " + intToHex(reg).toStdString());
+    return true;
 }
 
 QByteArray I2CDriver::readBytes(quint8 reg, quint8 count)
@@ -86,14 +97,12 @@ QByteArray I2CDriver::readBytes(quint8 reg, quint8 count)
     QByteArray data(count, 0);  // Automating Memory Management with Qt Containers
     {
         QMutexLocker locker(&i2cMutex_);
-        if (i2cReadI2CBlockData(i2cHandle_, reg, data.data(), count) == count) {
+        if (i2cReadI2CBlockData(i2cHandle_, reg, data.data(), count) != count) {
             // qDebug() << "[LOG]: Read bytes from register" << intToHex(reg) << ", Value:" << count << "bytes.";
-            return data;
-        }
-        else {
-            throw std::runtime_error("[ERROR]: Failed to read bytes from I2C device at register " + intToHex(reg).toStdString());
+            emit errorOccurred("Failed to read bytes from I2C device at register " + intToHex(reg));
             return QByteArray();
         }
+        return data;
     }
 }
 

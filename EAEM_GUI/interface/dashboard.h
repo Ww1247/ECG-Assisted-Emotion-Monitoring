@@ -14,10 +14,13 @@
 
 class DashboardWidget : public QWidget {
     Q_OBJECT
+
 public:
     explicit DashboardWidget(QWidget *parent = nullptr);
     void pushButton_start_emotion_detection_clicked();
     void pushButton_stop_emotion_detection_clicked();
+    void set_pushbuton_enable_start();
+    void set_pushbuton_enable_stop();
 
 private:
     QPushButton *pushButton_start_emotion_detection;

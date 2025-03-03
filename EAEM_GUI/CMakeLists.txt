@@ -46,6 +46,7 @@ else()
         module/camera_capture.h module/camera_capture.cpp
         sensors/max30102.h sensors/max30102.cpp
         sensors/aht20.h sensors/aht20.cpp
+        sensors/sensor_factory.h sensors/sensor_factory.cpp
     )
 endif()
 

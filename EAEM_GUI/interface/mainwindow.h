@@ -40,6 +40,8 @@ private:
 
 private slots:
 
+signals:
+
 };
 
 #endif // MAINWINDOW_H

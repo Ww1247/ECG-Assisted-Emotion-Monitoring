@@ -66,3 +66,15 @@ void DashboardWidget::updateSystemDateTime(QLabel *dateLabel, QLabel *timeLabel)
     dateLabel->setText("Date: " + currentDate);
     timeLabel->setText("Time: " + currentTime);
 }
+
+void DashboardWidget::set_pushbuton_enable_start()
+{
+    this->pushButton_start_emotion_detection->setEnabled(false);
+    this->pushButton_stop_emotion_detection->setEnabled(true);
+}
+
+void DashboardWidget::set_pushbuton_enable_stop()
+{
+    this->pushButton_start_emotion_detection->setEnabled(true);
+    this->pushButton_stop_emotion_detection->setEnabled(false);
+}

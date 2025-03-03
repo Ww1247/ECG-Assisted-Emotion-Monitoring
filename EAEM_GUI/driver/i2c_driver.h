@@ -5,6 +5,7 @@
 #include <QMutex>
 #include <QMutexLocker>
 #include <QByteArray>
+#include <QMap>
 #include <pigpio.h>
 
 /**
@@ -22,13 +23,7 @@ public:
      * @brief Constructs an I2CDriver object.
      * @param deviceAddress The I2C device address.
      */
-    explicit I2CDriver(int deviceAddress, QObject *parent = nullptr);
-
-    /**
-     * @brief Destructs the I2CDriver object.
-     * Closes the I2C handle.
-     */
-    ~I2CDriver();
+    static I2CDriver* getInstance (int deviceAddresss);
 
     /**
      * @brief Initializes the I2C device.
@@ -75,9 +70,18 @@ public:
     QByteArray readBytes(quint8 reg, quint8 count);
 
 private:
+    static QMap<int, I2CDriver*> instances;
+    static QMutex i2cMutex_;     ///< Qt thread lock to ensure thread safety in I2C operations
+    explicit I2CDriver(int deviceAddress, QObject *parent = nullptr);
+
+    /**
+     * @brief Destructs the I2CDriver object.
+     * Closes the I2C handle.
+     */
+    ~I2CDriver();
+
     int i2cHandle_;       ///< I2C handle returned by pigpio
     int deviceAddress_;   ///< I2C device address
-    static QMutex i2cMutex_;     ///< Qt thread lock to ensure thread safety in I2C operations
 
     /**
      * @brief Converts an integer to a hexadecimal string.

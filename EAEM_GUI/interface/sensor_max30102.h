@@ -17,6 +17,8 @@ class SensorMAX30102Widget : public QWidget {
     Q_OBJECT
 public:
     explicit SensorMAX30102Widget(QWidget *parent = nullptr);
+    bool sensorReadStart();
+    bool sensorReadStop();
 
 private:
     void initUI();
@@ -41,6 +43,9 @@ private slots:
     void on_checkBox_mode_changed(bool checked);
     void on_slider_heart_rate_changed(int value);
     void on_slider_blood_oxygen_changed(int value);
+
+signals:
+    void sig_max30102_errorOccurred(const QString &error_message);
 };
 
 #endif // MAX30102_H

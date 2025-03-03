@@ -14,16 +14,27 @@ CameraDriver::~CameraDriver()
 }
 
 // Set frame rate
-void CameraDriver::setFPS(int fps)
+void CameraDriver::setFPS(int newFPS)
 {
-    this->fps = fps;
+    QMutexLocker locker(&mutex); // Ensure thread safety
+    newFPS = fps;
+    if (cap.isOpened()) {
+        cap.set(cv::CAP_PROP_FPS, newFPS);
+        qDebug() << "Updated FPS to" << newFPS;
+    }
 }
 
 // Set resolution
-void CameraDriver::setResolution(int width, int height)
+void CameraDriver::setResolution(int newWidth, int newHeight)
 {
-    this->width = width;
-    this->height = height;
+    QMutexLocker locker(&mutex); // Ensure thread safety
+    width = newWidth;
+    height = newHeight;
+    if (cap.isOpened()) {
+        cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
+        cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+        qDebug() << "Updated resolution to" << width << "x" << height;
+    }
 }
 
 // Run thread

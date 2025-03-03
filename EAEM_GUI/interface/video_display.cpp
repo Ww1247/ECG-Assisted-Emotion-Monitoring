@@ -3,14 +3,24 @@
 
 VideoDisplayWidget::VideoDisplayWidget(QWidget *parent) : QWidget(parent) {
     initUI();
+    camera_capture = new CameraCapture(this);
+    connect(camera_capture, &CameraCapture::frameReady, this, &VideoDisplayWidget::updateFrame);
+    camera_capture->start();
+}
+
+VideoDisplayWidget::~VideoDisplayWidget()
+{
+    camera_capture->stop();
+    qDebug() << "Video Display Widget End";
 }
 
 void VideoDisplayWidget::initUI() {
     // Create Video Display group box
     QGroupBox *groupBox_video_display = new QGroupBox("Video Display", this);
+    groupBox_video_display->setContentsMargins(9, 9, 9, 9);
 
     // Video display area
-    QWidget *widget_video_display = new QWidget;
+    widget_video_display = new QWidget(this);
     widget_video_display->setMinimumSize(300, 300);
 
     // Resolution selection
@@ -56,12 +66,37 @@ void VideoDisplayWidget::initUI() {
     setLayout(mainLayout);
 }
 
-void VideoDisplayWidget::on_comboBox_resolution_currentIndexChanged(int index)
+// Update the video frame
+void VideoDisplayWidget::updateFrame(const QImage &frame)
 {
-    qDebug() << "Video Index" << index;
+    image = frame;
+    update(); // Trigger repaint
 }
 
+// Render the video frame onto the display widget
+void VideoDisplayWidget::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+    if (!image.isNull()) {
+        painter.drawImage(widget_video_display->geometry(), image);
+    }
+}
+
+// Handle resolution change
+void VideoDisplayWidget::on_comboBox_resolution_currentIndexChanged(int index)
+{
+    if (index == 0) {
+        camera_capture->setResolution(800, 600);
+    } else if (index == 1) {
+        camera_capture->setResolution(1024, 720);
+    }
+    qDebug() << "Resolution changed to" << comboBox_resolution->currentText();
+}
+
+// Handle FPS change
 void VideoDisplayWidget::on_comboBox_video_fps_currentIndexChanged(int index)
 {
-    qDebug() << "Video FPS" << index;
+    int fps = (index == 0) ? 30 : 60;
+    camera_capture->setFPS(fps);
+    qDebug() << "FPS changed to" << fps;
 }

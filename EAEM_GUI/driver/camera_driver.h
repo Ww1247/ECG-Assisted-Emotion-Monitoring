@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QThread>
 #include <QImage>
+#include <QMutex>
 #include <opencv2/opencv.hpp>
 
 class CameraDriver : public QThread
@@ -16,8 +17,8 @@ public:
 
     void run() override;       // Thread execution function
     void stop();               // Stop the camera
-    void setFPS(int fps);      // Set the frame rate
-    void setResolution(int width, int height); // Set the resolution
+    void setFPS(int newFPS);      // Set the frame rate
+    void setResolution(int width, int newHeight); // Set the resolution
 
 signals:
     void frameReady(const QImage &frame);  // Signal to send processed frames
@@ -29,6 +30,7 @@ private:
     int width;
     int height;
     bool running;
+    QMutex mutex;
 };
 
 #endif // CAMERATHREAD_H

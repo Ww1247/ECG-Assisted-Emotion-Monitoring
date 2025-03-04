@@ -17,11 +17,22 @@ VideoDisplayWidget::~VideoDisplayWidget()
 void VideoDisplayWidget::initUI() {
     // Create Video Display group box
     QGroupBox *groupBox_video_display = new QGroupBox("Video Display", this);
-    groupBox_video_display->setContentsMargins(9, 9, 9, 9);
+
+    // Frame for video display area
+    QFrame *frame_video_display = new QFrame(groupBox_video_display);
+    frame_video_display->setFrameStyle(QFrame::Sunken | QFrame::StyledPanel);
+    frame_video_display->setMinimumSize(320, 320);
 
     // Video display area
-    widget_video_display = new QWidget(this);
-    widget_video_display->setMinimumSize(300, 300);
+    label_video_display = new QLabel(frame_video_display);
+    label_video_display->setMinimumSize(300, 300);
+    label_video_display->setAlignment(Qt::AlignCenter);
+    label_video_display->setStyleSheet("background-color: black;");
+
+    // Layout for video display
+    QVBoxLayout *layout_video_display = new QVBoxLayout(frame_video_display);
+    layout_video_display->addWidget(label_video_display);
+    layout_video_display->setContentsMargins(0, 0, 0, 0);
 
     // Resolution selection
     QLabel *label_resolution = new QLabel("Resolution:");
@@ -54,7 +65,7 @@ void VideoDisplayWidget::initUI() {
 
     // Vertical layout
     QVBoxLayout *verticalLayout_video_display = new QVBoxLayout;
-    verticalLayout_video_display->addWidget(widget_video_display);
+    verticalLayout_video_display->addWidget(frame_video_display);
     verticalLayout_video_display->addLayout(horizontalLayout_video_control);
 
     // Set layout for the group box
@@ -70,16 +81,9 @@ void VideoDisplayWidget::initUI() {
 void VideoDisplayWidget::updateFrame(const QImage &frame)
 {
     image = frame;
-    update(); // Trigger repaint
-}
-
-// Render the video frame onto the display widget
-void VideoDisplayWidget::paintEvent(QPaintEvent *event)
-{
-    QPainter painter(this);
-    if (!image.isNull()) {
-        painter.drawImage(widget_video_display->geometry(), image);
-    }
+    label_video_display->setPixmap(QPixmap::fromImage(image).scaled(label_video_display->size(),
+                                                                    Qt::KeepAspectRatio,
+                                                                    Qt::SmoothTransformation));
 }
 
 // Handle resolution change

@@ -5,6 +5,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    initialize_GPIO();
     UI_SetUp();
     connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_start, this, &MainWindow::on_pushbutton_emotion_detection_start_clicked);
     connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_stop, this, &MainWindow::on_pushbutton_emotion_detection_stop_clicked);
@@ -82,5 +83,26 @@ void MainWindow::on_pushbutton_emotion_detection_stop_clicked()
     dashboardWidget->set_pushbuton_enable_stop();
     if (!sensorMAX30102Widget->sensorReadStop()) {
         dashboardWidget->set_pushbuton_enable_start();
+    }
+}
+
+void MainWindow::initialize_GPIO()
+{
+    int retryCount = 0;
+    const int maxRetries = 5;
+    // Initial GPIO
+    while(retryCount < maxRetries){
+        if (gpioInitialise() < 0) {
+            qDebug() << "Failed to initialize pigpio. Retrying in 1 second...";
+            QThread::sleep(2); // wait for 1 s
+            retryCount++;
+            continue; // continue loop
+        }
+        qDebug() << "Pigpio initialized successfully";
+        break; // Successful initialization, jump out of the loop
+    }
+
+    if (retryCount == maxRetries) {
+        qDebug() << "Failed to initialize pigpio after " << maxRetries << " attempts.";
     }
 }

@@ -6,8 +6,8 @@
 SensorMAX30102Widget::SensorMAX30102Widget(QWidget *parent) : QWidget(parent)
 {
     initUI();
-    MAX30102 *sensor = new MAX30102(0x57);
-    QThread *sensorThread = new QThread(this);
+    sensor = new MAX30102(0x57);
+    sensorThread = new QThread(this);
     sensor->moveToThread(sensorThread);
 
 //    connect(, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -20,6 +20,12 @@ SensorMAX30102Widget::SensorMAX30102Widget(QWidget *parent) : QWidget(parent)
 //               [=](int value){ sensor->setLEDPulseAmplitude(static_cast<quint8>(value)); });
 
 }
+
+SensorMAX30102Widget::~SensorMAX30102Widget()
+{
+    sensorReadStop();
+}
+
 
 void SensorMAX30102Widget::initUI()
 {
@@ -152,10 +158,13 @@ void SensorMAX30102Widget::on_checkBox_mode_changed(bool checked)
 
     if (checkBox_heart_rate_mode->isChecked()) {
         qDebug() << "Heart Rate Mode Selected";
+        sensor->setMode(0x02);
     } else if (checkBox_blood_oxygen_mode->isChecked()) {
         qDebug() << "SpO2 Mode Selected";
+        sensor->setMode(0x03);
     } else if (checkBox_mixed_mode->isChecked()) {
         qDebug() << "Mixed Mode Selected";
+        sensor->setMode(0x07);
     }
 }
 

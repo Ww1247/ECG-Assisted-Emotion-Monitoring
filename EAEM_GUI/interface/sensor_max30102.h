@@ -20,6 +20,8 @@ class SensorMAX30102Widget : public QWidget {
 
 public:
     explicit SensorMAX30102Widget(QWidget *parent = nullptr);
+    ~SensorMAX30102Widget();
+
     bool sensorReadStart();
     bool sensorReadStop();
 
@@ -39,6 +41,9 @@ private:
     // Sliders for real-time value adjustment
     QSlider *slider_heart_rate;
     QSlider *slider_blood_oxygen;
+
+    MAX30102 *sensor;
+    QThread *sensorThread;
 
 private slots:
     void on_comboBox_sampling_rate_currentIndexChanged(int index);

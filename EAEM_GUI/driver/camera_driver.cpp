@@ -1,4 +1,5 @@
 #include "camera_driver.h"
+
 #include <QDebug>
 #include <QImage>
 #include <QMutex>

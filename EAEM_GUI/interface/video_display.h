@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QImage>
-#include <QPainter>
+#include <QPixmap>
 
 #include "camera_capture.h"
 
@@ -28,7 +28,7 @@ public slots:
 private:
     QComboBox *comboBox_resolution;
     QComboBox *comboBox_video_fps;
-    QWidget *widget_video_display;
+    QLabel *label_video_display;
     CameraCapture *camera_capture;
     QImage image;
 
@@ -36,8 +36,6 @@ private:
 
 private slots:
 
-protected:
-    void paintEvent(QPaintEvent *event) override;
 
 };
 

@@ -8,7 +8,7 @@ I2CDriver::I2CDriver(int deviceAddress, QObject *parent)
       deviceAddress_(deviceAddress),
       i2cHandle_(-1)
 {
-    initialize();
+//    initialize();
 }
 
 I2CDriver::~I2CDriver()

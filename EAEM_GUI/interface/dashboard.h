@@ -17,8 +17,7 @@ class DashboardWidget : public QWidget {
 
 public:
     explicit DashboardWidget(QWidget *parent = nullptr);
-    void pushButton_start_emotion_detection_clicked();
-    void pushButton_stop_emotion_detection_clicked();
+
     void set_pushbuton_enable_start();
     void set_pushbuton_enable_stop();
 
@@ -28,6 +27,10 @@ private:
 
     void initUI();
     static void updateSystemDateTime(QLabel *dateLabel, QLabel *timeLabel);
+
+private slots:
+    void on_pushButton_EmotionDetection_Start_Clicked();
+    void on_pushButton_EmotionDetection_Stop_Clicked();
 
 signals:
     void sig_emotion_detection_start();

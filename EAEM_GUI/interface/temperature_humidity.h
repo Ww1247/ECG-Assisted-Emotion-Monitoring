@@ -10,7 +10,9 @@
 #include "qcustomplot.h"
 
 class TemperatureHumidityWidget : public QWidget {
+
     Q_OBJECT
+
 public:
     explicit TemperatureHumidityWidget(QWidget *parent = nullptr);
 

@@ -1,10 +1,13 @@
 #include "emotion_indicator.h"
 
-EmotionIndicatorWidget::EmotionIndicatorWidget(QWidget *parent) : QWidget(parent) {
+EmotionIndicatorWidget::EmotionIndicatorWidget(QWidget *parent)
+    : QWidget(parent)
+{
     initUI();
 }
 
-void EmotionIndicatorWidget::initUI() {
+void EmotionIndicatorWidget::initUI()
+{
     // Create main group box
     groupBox = new QGroupBox("Emotion Indicator", this);
 
@@ -59,4 +62,14 @@ void EmotionIndicatorWidget::initUI() {
 
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(groupBox);
+}
+
+void EmotionIndicatorWidget::replace_textEditInfo_Display(const QString &message)
+{
+    this->textEditInfo->setPlainText(message);
+}
+
+void EmotionIndicatorWidget::append_textEditInfo_Display(const QString &message)
+{
+    this->textEditInfo->append(message);
 }

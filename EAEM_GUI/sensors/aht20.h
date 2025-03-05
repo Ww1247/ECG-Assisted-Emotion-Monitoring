@@ -1,28 +1,29 @@
 #ifndef AHT20_H
 #define AHT20_H
 
-#include "i2c_driver.h"
 #include <QObject>
-#include <QThread>
-#include <QDebug>
+#include <QAtomicInt>
+
+#include "i2c_driver.h"
 
 /**
  * @brief AHT20 sensor driver class.
  *
- * This class provides an interface for communicating with the AHT20 temperature
- * and humidity sensor using I2C protocol.
+ * This class runs in a separate thread and continuously monitors the sensor's
+ * status register. When new data is available, it triggers a measurement
+ * and emits a signal with the updated temperature and humidity values.
  */
 class AHT20 : public QObject
 {
     Q_OBJECT
 
 public:
-
     /**
      * @brief Constructs an AHT20 sensor object.
-     * @param i2cDriver A pointer to the I2CDriver instance handling communication.
+     * @param i2cDriver A pointer to the I2C driver for communication.
      */
     explicit AHT20(I2CDriver *i2cDriver, QObject *parent = nullptr);
+    ~AHT20();
 
     /**
      * @brief Initializes the AHT20 sensor.
@@ -30,39 +31,34 @@ public:
      */
     bool initialize();
 
+public slots:
     /**
-     * @brief Triggers a measurement and reads temperature and humidity data.
-     * @param temperature Reference to a float where temperature (�C) will be stored.
-     * @param humidity Reference to a float where humidity (%) will be stored.
-     * @return true if the measurement is successful, false otherwise.
+     * @brief Monitors the sensor for new data and triggers measurements.
+     *
+     * This function runs continuously in a separate thread.
      */
-    bool readTemperatureAndHumidity(float &temperature, float &humidity);
-
-private:
-
-    I2CDriver *i2cDriver_; ///< Pointer to I2C driver instance.
-
-    /**
-     * @brief Sends a soft reset command to the AHT20 sensor.
-     * @return true if successful, false otherwise.
-     */
-    bool softReset();
-
-    /**
-     * @brief Checks if the sensor is calibrated.
-     * @return true if calibrated, false otherwise.
-     */
-    bool isCalibrated();
-
-    /**
-     * @brief Starts a measurement process.
-     * @return true if successful, false otherwise.
-     */
-    bool triggerMeasurement();
+    void startMonitorSensor();
+    void stopMonitoring();
 
 signals:
+    /**
+     * @brief Emitted when new temperature and humidity data is available.
+     * @param temperature The measured temperature in ��C.
+     * @param humidity The measured humidity in %.
+     */
+    void dataReady(float temperature, float humidity);
 
-    void errorOccurred(const QString &error_message);
+private:
+    I2CDriver *i2cDriver_;  ///< I2C communication driver.
+    QAtomicInt keepRunning_;
+    int deviceAddress_;
+    volatile bool isReading;
+
+    /**
+     * @brief Checks if new sensor data is available.
+     * @return true if data is ready, false otherwise.
+     */
+    bool checkSensorReady();
 };
 
 #endif // AHT20_H

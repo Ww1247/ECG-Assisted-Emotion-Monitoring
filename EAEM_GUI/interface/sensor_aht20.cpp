@@ -1,10 +1,32 @@
 #include "sensor_aht20.h"
+#include <QDebug>
 
-SensorAHT20Widget::SensorAHT20Widget(QWidget *parent) : QWidget(parent) {
+#define AHT20_I2C_ADDRESS  0x38
+
+SensorAHT20Widget::SensorAHT20Widget(QWidget *parent)
+    : QWidget(parent)
+{
     initUI();
+//    startSensorThread();
 }
 
-void SensorAHT20Widget::initUI() {
+SensorAHT20Widget::~SensorAHT20Widget() {
+    if (sensorThread_) {
+        aht20_->stopMonitoring();
+        sensorThread_->quit();
+        sensorThread_->wait();
+        delete aht20_;      // delete AHT20
+        delete sensorThread_;
+    }
+
+    if (i2cDriver_) {
+        delete i2cDriver_;  // delete I2C driver
+    }
+    gpioTerminate();
+}
+
+void SensorAHT20Widget::initUI()
+{
     // Create AHT20 sensor group box
     QGroupBox *groupBox_sensor_aht20 = new QGroupBox("AHT20", this);
     groupBox_sensor_aht20->setGeometry(120, 190, 624, 100);
@@ -12,7 +34,7 @@ void SensorAHT20Widget::initUI() {
     // Temperature display
     QLabel *label_temperature = new QLabel("Temperature:");
     label_temperature->setMinimumSize(90, 0);
-    QLineEdit *lineEdit_temperature_value = new QLineEdit;
+    lineEdit_temperature_value = new QLineEdit;
     lineEdit_temperature_value->setMinimumSize(100, 0);
     lineEdit_temperature_value->setAlignment(Qt::AlignCenter);
     lineEdit_temperature_value->setReadOnly(true);
@@ -51,7 +73,7 @@ void SensorAHT20Widget::initUI() {
     // Humidity display
     QLabel *label_humidity = new QLabel("Humidity:");
     label_humidity->setMinimumSize(90, 0);
-    QLineEdit *lineEdit_humidity_value = new QLineEdit;
+    lineEdit_humidity_value = new QLineEdit;
     lineEdit_humidity_value->setMinimumSize(100, 0);
     lineEdit_humidity_value->setAlignment(Qt::AlignCenter);
     lineEdit_humidity_value->setReadOnly(true);
@@ -107,4 +129,56 @@ void SensorAHT20Widget::initUI() {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(groupBox_sensor_aht20);
     setLayout(mainLayout);
+}
+
+void SensorAHT20Widget::startSensorThread()
+{
+//    QStringList errorMessage;
+    i2cDriver_ = new I2CDriver(AHT20_I2C_ADDRESS, this);
+    if (!i2cDriver_->initialize()) {
+//        QMessageBox::critical(this, "I2C Error", "Failed to initialize I2CDriver for AHT20");
+//        qDebug() << "Failed to initialize I2CDriver for AHT20";
+        return;
+    }
+    // Create Thread
+    sensorThread_ = new QThread(this);
+    aht20_ = new AHT20(i2cDriver_);
+
+    // Move AHT20 to new thread
+    aht20_->moveToThread(sensorThread_);
+
+    // Connect signal slots
+    connect(sensorThread_, &QThread::started, aht20_, &AHT20::startMonitorSensor);
+    connect(aht20_, &AHT20::dataReady, this, &SensorAHT20Widget::onDataReady);
+
+    // Start thread
+    sensorThread_->start();
+}
+
+void SensorAHT20Widget::onDataReady(float temperature, float humidity)
+{
+    QMetaObject::invokeMethod(this, [this, temperature, humidity]() {
+        lineEdit_temperature_value->setText(QString::number(temperature, 'f', 2) + " C");
+        lineEdit_humidity_value->setText(QString::number(humidity, 'f', 2) + " %");
+    }, Qt::QueuedConnection);
+}
+
+void SensorAHT20Widget::sensorReadStart()
+{
+    if (!i2cDriver_) {
+        startSensorThread();
+    }
+
+    qDebug() << "MAX30102 Sensor Reading Start.";
+    if (aht20_) {
+        QMetaObject::invokeMethod(aht20_, "startMonitorSensor", Qt::QueuedConnection);
+    }
+}
+
+void SensorAHT20Widget::sensorReadStop()
+{
+    qDebug() << "MAX30102 Sensor Reading Stop.";
+    if (aht20_) {
+        QMetaObject::invokeMethod(aht20_, "stopMonitoring", Qt::QueuedConnection);
+    }
 }

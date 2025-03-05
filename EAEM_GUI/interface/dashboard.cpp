@@ -1,6 +1,8 @@
 #include "dashboard.h"
 
-DashboardWidget::DashboardWidget(QWidget *parent) : QWidget(parent) {
+DashboardWidget::DashboardWidget(QWidget *parent)
+    : QWidget(parent)
+{
     initUI();
 }
 
@@ -11,10 +13,11 @@ void DashboardWidget::initUI() {
 
     // Create buttons
     pushButton_start_emotion_detection = new QPushButton("Start Emotion Detection");
-    connect(pushButton_start_emotion_detection, &QPushButton::clicked, this, &DashboardWidget::sig_emotion_detection_start);
+    connect(pushButton_start_emotion_detection, &QPushButton::clicked, this, &DashboardWidget::on_pushButton_EmotionDetection_Start_Clicked);
 
     pushButton_stop_emotion_detection = new QPushButton("Stop Emotion Detection");
-    connect(pushButton_stop_emotion_detection, &QPushButton::clicked, this, &DashboardWidget::sig_emotion_detection_stop);
+    pushButton_stop_emotion_detection->setEnabled(false);
+    connect(pushButton_stop_emotion_detection, &QPushButton::clicked, this, &DashboardWidget::on_pushButton_EmotionDetection_Stop_Clicked);
 
     // Create labels for system date and time
     QLabel *label_system_date = new QLabel();
@@ -65,6 +68,18 @@ void DashboardWidget::updateSystemDateTime(QLabel *dateLabel, QLabel *timeLabel)
 
     dateLabel->setText("Date: " + currentDate);
     timeLabel->setText("Time: " + currentTime);
+}
+
+void DashboardWidget::on_pushButton_EmotionDetection_Start_Clicked()
+{
+    pushButton_start_emotion_detection->setEnabled(false);
+    emit sig_emotion_detection_start();
+}
+
+void DashboardWidget::on_pushButton_EmotionDetection_Stop_Clicked()
+{
+    set_pushbuton_enable_stop();
+    emit sig_emotion_detection_stop();
 }
 
 void DashboardWidget::set_pushbuton_enable_start()

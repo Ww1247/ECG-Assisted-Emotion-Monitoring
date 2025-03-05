@@ -1,14 +1,16 @@
 #include "sensor_max30102.h"
-
 #include <QDebug>
-#include <QThread>
 
-SensorMAX30102Widget::SensorMAX30102Widget(QWidget *parent) : QWidget(parent)
+#define MAX30102_I2C_ADDRESS 0x57
+
+SensorMAX30102Widget::SensorMAX30102Widget(QWidget *parent)
+    : QWidget(parent)
 {
     initUI();
-    sensor = new MAX30102(0x57);
-    sensorThread = new QThread(this);
-    sensor->moveToThread(sensorThread);
+
+//    i2cDriver_ = new MAX30102(0x57);
+//    sensorThread = new QThread(this);
+//    i2cDriver_->moveToThread(sensorThread);
 
 //    connect(, QOverload<int>::of(&QComboBox::currentIndexChanged),
 //               [=](int index){ sensor->setMode(static_cast<quint8>(index + 2)); });
@@ -154,18 +156,18 @@ void SensorMAX30102Widget::on_slider_blood_oxygen_changed(int value)
 // Slot function to handle mode selection
 void SensorMAX30102Widget::on_checkBox_mode_changed(bool checked)
 {
-    if (!checked) return;  // Ignore unchecked state
+//    if (!checked) return;  // Ignore unchecked state
 
-    if (checkBox_heart_rate_mode->isChecked()) {
-        qDebug() << "Heart Rate Mode Selected";
-        sensor->setMode(0x02);
-    } else if (checkBox_blood_oxygen_mode->isChecked()) {
-        qDebug() << "SpO2 Mode Selected";
-        sensor->setMode(0x03);
-    } else if (checkBox_mixed_mode->isChecked()) {
-        qDebug() << "Mixed Mode Selected";
-        sensor->setMode(0x07);
-    }
+//    if (checkBox_heart_rate_mode->isChecked()) {
+//        qDebug() << "Heart Rate Mode Selected";
+//        i2cDriver_->setMode(0x02);
+//    } else if (checkBox_blood_oxygen_mode->isChecked()) {
+//        qDebug() << "SpO2 Mode Selected";
+//        i2cDriver_->setMode(0x03);
+//    } else if (checkBox_mixed_mode->isChecked()) {
+//        qDebug() << "Mixed Mode Selected";
+//        i2cDriver_->setMode(0x07);
+//    }
 }
 
 bool SensorMAX30102Widget::sensorReadStart()

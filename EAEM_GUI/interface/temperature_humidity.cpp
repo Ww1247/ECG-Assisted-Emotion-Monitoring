@@ -1,6 +1,8 @@
 #include "temperature_humidity.h"
 
-TemperatureHumidityWidget::TemperatureHumidityWidget(QWidget *parent) : QWidget(parent) {
+TemperatureHumidityWidget::TemperatureHumidityWidget(QWidget *parent)
+    : QWidget(parent)
+{
     initUI();
 }
 

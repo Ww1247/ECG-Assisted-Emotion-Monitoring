@@ -11,14 +11,21 @@
 #include <QImage>
 #include <QPixmap>
 
-#include "camera_capture.h"
+#include "camera_driver.h"
 
 class VideoDisplayWidget : public QWidget {
+
     Q_OBJECT
 
 public:
     explicit VideoDisplayWidget(QWidget *parent = nullptr);
     ~VideoDisplayWidget();
+
+    void initCamera();
+    void start(int cameraIndex = 0);            // Start the camera
+    void stop();                                // Stop the camera
+    void setFPS(int fps);                       // Set FPS
+    void setResolution(int width, int height);  // Set resolution
 
 public slots:
     void updateFrame(const QImage &frame);
@@ -29,13 +36,15 @@ private:
     QComboBox *comboBox_resolution;
     QComboBox *comboBox_video_fps;
     QLabel *label_video_display;
-    CameraCapture *camera_capture;
+    CameraDriver *cameraDriver;
     QImage image;
 
     void initUI();
 
 private slots:
 
+signals:
+    void frameReady(const QImage &frame);
 
 };
 

@@ -12,10 +12,12 @@
 #include <QSlider>
 #include <QSpacerItem>
 #include <QComboBox>
+#include <QThread>
 
 #include "max30102.h"
 
 class SensorMAX30102Widget : public QWidget {
+
     Q_OBJECT
 
 public:

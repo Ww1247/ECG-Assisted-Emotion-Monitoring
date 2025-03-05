@@ -11,8 +11,12 @@
 
 class EmotionIndicatorWidget : public QWidget {
     Q_OBJECT
+
 public:
     explicit EmotionIndicatorWidget(QWidget *parent = nullptr);
+
+    void replace_textEditInfo_Display(const QString &message);
+    void append_textEditInfo_Display(const QString &message);
 
 private:
     void initUI();

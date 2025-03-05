@@ -1,10 +1,13 @@
 #include "ecg_hrv.h"
 
-EcgHrvWidget::EcgHrvWidget(QWidget *parent) : QWidget(parent) {
+EcgHrvWidget::EcgHrvWidget(QWidget *parent)
+    : QWidget(parent)
+{
     initUI();
 }
 
-void EcgHrvWidget::initUI() {
+void EcgHrvWidget::initUI()
+{
     // ECG Group Box
     QGroupBox *groupBox_ECG = new QGroupBox("ECG", this);
 

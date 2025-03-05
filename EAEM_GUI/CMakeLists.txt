@@ -46,8 +46,6 @@ else()
         interface/ecg_hrv.h interface/ecg_hrv.cpp
         interface/temperature_humidity.h interface/temperature_humidity.cpp
 
-        module/camera_capture.h module/camera_capture.cpp
-
         sensors/aht20.h sensors/aht20.cpp
         sensors/max30102.h sensors/max30102.cpp
     )
@@ -58,7 +56,6 @@ target_include_directories(EAEM_GUI PRIVATE
         ${CMAKE_SOURCE_DIR}/arithmetic
         ${CMAKE_SOURCE_DIR}/driver
         ${CMAKE_SOURCE_DIR}/interface
-        ${CMAKE_SOURCE_DIR}/module
         ${CMAKE_SOURCE_DIR}/sensors       
 )
 

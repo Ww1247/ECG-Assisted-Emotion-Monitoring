@@ -2,7 +2,7 @@
 #include <QThread>
 
 MAX30102::MAX30102(int deviceAddress, QObject *parent)
-    : QObject{parent},
+    : QObject(parent),
       deviceAddress_(deviceAddress),
       keepRunning_(false)
 {

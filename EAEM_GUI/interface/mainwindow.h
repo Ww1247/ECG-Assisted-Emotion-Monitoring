@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QStatusBar>
 #include <QThread>
+
 #include "dashboard.h"
 #include "video_display.h"
 #include "emotion_indicator.h"
@@ -31,7 +32,7 @@ public slots:
 
 private:
     void UI_SetUp();
-    void initialize_GPIO();
+    bool initialize_GPIO();
     DashboardWidget *dashboardWidget;
     VideoDisplayWidget *videoDisplayWidget;
     EmotionIndicatorWidget *emotionIndicatorWidget;
@@ -43,6 +44,10 @@ private:
 private slots:
 
 signals:
+    void sig_sendSystemInfoToReplace(const QString &message);
+    void sig_sendSysteminfoToAppend(const QString &message);
+    void sig_videoCaptureStart();
+    void sig_videoCaptureStop();
 
 };
 

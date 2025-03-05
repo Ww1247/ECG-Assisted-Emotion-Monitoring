@@ -1,20 +1,21 @@
 #include "video_display.h"
 #include <QDebug>
 
-VideoDisplayWidget::VideoDisplayWidget(QWidget *parent) : QWidget(parent) {
-    camera_capture = new CameraCapture(this);
-    connect(camera_capture, &CameraCapture::frameReady, this, &VideoDisplayWidget::updateFrame);
-    camera_capture->start();
+VideoDisplayWidget::VideoDisplayWidget(QWidget *parent)
+    : QWidget(parent),
+      cameraDriver(nullptr)
+{
     initUI();
 }
 
 VideoDisplayWidget::~VideoDisplayWidget()
 {
-    camera_capture->stop();
+    stop();
     qDebug() << "Video Display Widget End";
 }
 
-void VideoDisplayWidget::initUI() {
+void VideoDisplayWidget::initUI()
+{
     // Create Video Display group box
     QGroupBox *groupBox_video_display = new QGroupBox("Video Display", this);
 
@@ -77,6 +78,43 @@ void VideoDisplayWidget::initUI() {
     setLayout(mainLayout);
 }
 
+void VideoDisplayWidget::initCamera()
+{
+    start();
+}
+
+// Handle resolution change
+void VideoDisplayWidget::on_comboBox_resolution_currentIndexChanged(int index)
+{
+    if (index == 0) {
+        setResolution(800, 600);
+    } else if (index == 1) {
+        setResolution(1024, 720);
+    }
+    qDebug() << "Resolution changed to" << comboBox_resolution->currentText();
+}
+
+void VideoDisplayWidget::setResolution(int width, int height)
+{
+    if (!cameraDriver) return;
+    cameraDriver->setResolution(width, height);
+}
+
+// Handle FPS change
+void VideoDisplayWidget::on_comboBox_video_fps_currentIndexChanged(int index)
+{
+    int fps = (index == 0) ? 30 : 60;
+    setFPS(fps);
+    qDebug() << "FPS changed to" << fps;
+}
+
+void VideoDisplayWidget::setFPS(int fps)
+{
+    if (cameraDriver) {
+        cameraDriver->setFPS(fps);
+    }
+}
+
 // Update the video frame
 void VideoDisplayWidget::updateFrame(const QImage &frame)
 {
@@ -86,21 +124,23 @@ void VideoDisplayWidget::updateFrame(const QImage &frame)
                                                                     Qt::SmoothTransformation));
 }
 
-// Handle resolution change
-void VideoDisplayWidget::on_comboBox_resolution_currentIndexChanged(int index)
+void VideoDisplayWidget::start(int cameraIndex)
 {
-    if (index == 0) {
-        camera_capture->setResolution(800, 600);
-    } else if (index == 1) {
-        camera_capture->setResolution(1024, 720);
+    if (cameraDriver) {
+        stop();
     }
-    qDebug() << "Resolution changed to" << comboBox_resolution->currentText();
+
+    cameraDriver = new CameraDriver(cameraIndex);
+    connect(cameraDriver, &CameraDriver::frameReady, this, &VideoDisplayWidget::updateFrame);
+    cameraDriver->start();
 }
 
-// Handle FPS change
-void VideoDisplayWidget::on_comboBox_video_fps_currentIndexChanged(int index)
+void VideoDisplayWidget::stop()
 {
-    int fps = (index == 0) ? 30 : 60;
-    camera_capture->setFPS(fps);
-    qDebug() << "FPS changed to" << fps;
+    if (cameraDriver) {
+        cameraDriver->stop();
+        cameraDriver->wait();
+        delete cameraDriver;
+        cameraDriver = nullptr;
+    }
 }

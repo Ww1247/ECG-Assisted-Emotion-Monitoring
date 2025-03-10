@@ -53,7 +53,7 @@ change the height and width for each of the contributors from 80 to 50.
 | Name         | ID       | Role                                                                                                                              |
 | ------------ |:--------:| --------------------------------------------------------------------------------------------------------------------------------- |
 |              | 3007288W | Responsible for the QT part of the code, including GUI design and communication code creation.                                    |
-|              |          |                                                                                                                                   |
+|   XIN GUO    | 2935682G | Facial expression recognition code writing                                                                                        |
 |              |          |                                                                                                                                   |
 |              |          |                                                                                                                                   |
 |              |          |                                                                                                                                   |

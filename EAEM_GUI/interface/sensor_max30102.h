@@ -57,6 +57,7 @@ private slots:
 
 signals:
     void sig_max30102_errorOccurred(const QString &error_message);
+
 };
 
 #endif // SENSOR_MAX30102_H

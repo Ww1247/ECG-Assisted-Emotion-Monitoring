@@ -31,6 +31,7 @@ else()
         ${PROJECT_SOURCES}
         arithmetic/facial_analyzer.h arithmetic/facial_analyzer.cpp
         arithmetic/ecg_analyzer.h arithmetic/ecg_analyzer.cpp
+        arithmetic/video_processor.h arithmetic/video_processor.cpp
 
         driver/plot_driver.h driver/plot_driver.cpp
         driver/qcustomplot.h driver/qcustomplot.cpp

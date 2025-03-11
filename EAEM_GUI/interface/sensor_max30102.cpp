@@ -25,7 +25,7 @@ SensorMAX30102Widget::SensorMAX30102Widget(QWidget *parent)
 
 SensorMAX30102Widget::~SensorMAX30102Widget()
 {
-    sensorReadStop();
+//    sensorReadStop();
 }
 
 

@@ -12,9 +12,9 @@ void EcgHrvWidget::initUI()
     QGroupBox *groupBox_ECG = new QGroupBox("ECG", this);
 
     // ECG Display Options
-    QRadioButton *radioButton_ECG_display = new QRadioButton("ECG Display");
-    QRadioButton *radioButton_blood_oxygen_display = new QRadioButton("Blood Oxygen");
-    QRadioButton *radioButton_avg_heart_rate_display = new QRadioButton("Avg Heart Rate");
+    radioButton_ECG_display = new QRadioButton("ECG Display", this);
+    radioButton_blood_oxygen_display = new QRadioButton("Blood Oxygen", this);
+    radioButton_avg_heart_rate_display = new QRadioButton("Avg Heart Rate", this);
     radioButton_ECG_display->setChecked(true);
 
     QHBoxLayout *horizontalLayout_ECG_config = new QHBoxLayout;
@@ -49,9 +49,9 @@ void EcgHrvWidget::initUI()
     QGroupBox *groupBox_HRV = new QGroupBox("HRV", this);
 
     // HRV Display Options
-    QRadioButton *radioButton_HRV_RMSSD = new QRadioButton("RMSSD");
-    QRadioButton *radioButton_HRV_SDNN = new QRadioButton("SDNN");
-    QRadioButton *radioButton_HRV_LF_HF = new QRadioButton("LF/HF");
+    radioButton_HRV_RMSSD = new QRadioButton("RMSSD", this);
+    radioButton_HRV_SDNN = new QRadioButton("SDNN", this);
+    radioButton_HRV_LF_HF = new QRadioButton("LF/HF", this);
     radioButton_HRV_RMSSD->setChecked(true);
 
     QHBoxLayout *horizontalLayout_HRV_config = new QHBoxLayout;
@@ -133,4 +133,14 @@ void EcgHrvWidget::setupPlot(QCustomPlot *plot, double yMin, double yMax, const 
     // customPlot->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
     plot->axisRect()->setRangeZoom(Qt::Horizontal);
     plot->axisRect()->setRangeDrag(Qt::Horizontal);
+}
+
+void EcgHrvWidget::set_UI_EnableDisable(const bool &status)
+{
+    radioButton_ECG_display->setEnabled(status);
+    radioButton_blood_oxygen_display->setEnabled(status);
+    radioButton_avg_heart_rate_display->setEnabled(status);
+    radioButton_HRV_RMSSD->setEnabled(status);
+    radioButton_HRV_SDNN->setEnabled(status);
+    radioButton_HRV_LF_HF->setEnabled(status);
 }

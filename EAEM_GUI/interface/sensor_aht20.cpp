@@ -7,22 +7,21 @@ SensorAHT20Widget::SensorAHT20Widget(QWidget *parent)
     : QWidget(parent)
 {
     initUI();
-//    startSensorThread();
 }
 
 SensorAHT20Widget::~SensorAHT20Widget() {
-    if (sensorThread_) {
-        aht20_->stopMonitoring();
-        sensorThread_->quit();
-        sensorThread_->wait();
-        delete aht20_;      // delete AHT20
-        delete sensorThread_;
-    }
+//    if (sensorThread_) {
+//        aht20_->stopMonitoring();
+//        sensorThread_->quit();
+//        sensorThread_->wait();
+//        delete aht20_;      // delete AHT20
+//        delete sensorThread_;
+//    }
 
-    if (i2cDriver_) {
-        delete i2cDriver_;  // delete I2C driver
-    }
-    gpioTerminate();
+//    if (i2cDriver_) {
+//        delete i2cDriver_;  // delete I2C driver
+//    }
+//    gpioTerminate();
 }
 
 void SensorAHT20Widget::initUI()
@@ -133,11 +132,12 @@ void SensorAHT20Widget::initUI()
 
 void SensorAHT20Widget::startSensorThread()
 {
+    qDebug() << "startSensorThread";
+
 //    QStringList errorMessage;
     i2cDriver_ = new I2CDriver(AHT20_I2C_ADDRESS, this);
     if (!i2cDriver_->initialize()) {
-//        QMessageBox::critical(this, "I2C Error", "Failed to initialize I2CDriver for AHT20");
-//        qDebug() << "Failed to initialize I2CDriver for AHT20";
+        emit sig_errorOccurred("Failed to initialize I2CDriver for AHT20");
         return;
     }
     // Create Thread

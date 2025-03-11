@@ -25,10 +25,10 @@ public:
 
     void sensorReadStart();
     void sensorReadStop();
+    void startSensorThread();
 
 private:
     void initUI();
-    void startSensorThread();
 
     I2CDriver *i2cDriver_;
     AHT20 *aht20_;
@@ -41,7 +41,7 @@ private slots:
     void onDataReady(float temperature, float humidity);
 
 signals:
-    void sig_errorOccurred(const QStringList &error_message);
+    void sig_errorOccurred(const QString &error_message);
 
 };
 

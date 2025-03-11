@@ -1,7 +1,5 @@
 #include "camera_driver.h"
-
 #include <QDebug>
-#include <QImage>
 
 // Constructor
 CameraDriver::CameraDriver(int cameraIndex, int fps, int width, int height, QObject *parent)
@@ -10,17 +8,41 @@ CameraDriver::CameraDriver(int cameraIndex, int fps, int width, int height, QObj
       fps(fps),
       width(width),
       height(height),
-      running_(false)
-{}
+      running_(false),
+      cameraThread_(new QThread(this))
+{
+    moveToThread(cameraThread_);
+    connect(cameraThread_, &QThread::started, this, &CameraDriver::process);
+    connect(this, &CameraDriver::stopped, cameraThread_, &QThread::quit);
+    connect(cameraThread_, &QThread::finished, cameraThread_, &QThread::deleteLater);
+}
 
 // Destructor
 CameraDriver::~CameraDriver()
 {
-    stop();
+    stopCamera();
 }
 
-// Run thread
-void CameraDriver::run()
+// Start thread
+void CameraDriver::startCamera()
+{
+    if (!cameraThread_->isRunning()) {
+        cameraThread_->start();
+    }
+}
+
+// Stop thread
+void CameraDriver::stopCamera()
+{
+    if (running_) {
+        running_ = false;
+        emit stopped();
+        qDebug() << "Camera thread stopped";
+    }
+}
+
+// Run in thread
+void CameraDriver::process()
 {
     cap.open(cameraIndex, cv::CAP_V4L2); // Turn on camera
 
@@ -56,22 +78,9 @@ void CameraDriver::run()
     cap.release();
 }
 
-// Stop thread
-void CameraDriver::stop()
-{
-    qDebug() << "Camera thread stopped";
-    running_.store(false, std::memory_order_relaxed);
-    wait();
-}
-
 // Set frame rate
 void CameraDriver::setFPS(int newFPS)
 {
-//    fps.store(newFPS, std::memory_order_relaxed); // Ensure thread safety
-//    if (cap.isOpened()) {
-//        cap.set(cv::CAP_PROP_FPS, fps.load(std::memory_order_relaxed));
-//        qDebug() << "Updated FPS to" << fps.load();
-//    }
     if (newFPS <= 0) return;
 
     fps.store(newFPS, std::memory_order_relaxed);
@@ -87,13 +96,6 @@ void CameraDriver::setFPS(int newFPS)
 // Set resolution
 void CameraDriver::setResolution(int newWidth, int newHeight)
 {
-//    width.store(newWidth, std::memory_order_relaxed);
-//    height.store(newHeight, std::memory_order_relaxed);
-//    if (cap.isOpened()) {
-//        cap.set(cv::CAP_PROP_FRAME_WIDTH, width.load());
-//        cap.set(cv::CAP_PROP_FRAME_HEIGHT, height.load());
-//        qDebug() << "Updated resolution to" << width.load() << "x" << height.load();
-//    }
     if (newWidth <= 0 || newHeight <= 0) return;
 
     width.store(newWidth, std::memory_order_relaxed);
@@ -117,5 +119,3 @@ void CameraDriver::setResolution(int newWidth, int newHeight)
         QThread::msleep(500); // Wait another 500ms to make sure the camera is stable
     }
 }
-
-

@@ -3,15 +3,18 @@
 
 VideoDisplayWidget::VideoDisplayWidget(QWidget *parent)
     : QWidget(parent),
-      cameraDriver(nullptr)
+      camera(nullptr),
+      processor(nullptr),
+      cameraRunning(false)
+
 {
     initUI();
 }
 
 VideoDisplayWidget::~VideoDisplayWidget()
 {
-    stop();
-    qDebug() << "Video Display Widget End";
+//    cameraStop();
+//    qDebug() << "Video Display Widget End";
 }
 
 void VideoDisplayWidget::initUI()
@@ -78,69 +81,116 @@ void VideoDisplayWidget::initUI()
     setLayout(mainLayout);
 }
 
-void VideoDisplayWidget::initCamera()
-{
-    start();
-}
-
 // Handle resolution change
 void VideoDisplayWidget::on_comboBox_resolution_currentIndexChanged(int index)
 {
-    if (index == 0) {
-        setResolution(800, 600);
-    } else if (index == 1) {
-        setResolution(1024, 720);
-    }
-    qDebug() << "Resolution changed to" << comboBox_resolution->currentText();
-}
-
-void VideoDisplayWidget::setResolution(int width, int height)
-{
-    if (!cameraDriver) return;
-    cameraDriver->setResolution(width, height);
+//    if (index == 0) {
+//        setResolution(800, 600);
+//    } else if (index == 1) {
+//        setResolution(1024, 720);
+//    }
+//    qDebug() << "Resolution changed to" << comboBox_resolution->currentText();
+    int width, height;
+    getSelectedResolution(width, height);
+    if (camera) camera->setResolution(width, height);
 }
 
 // Handle FPS change
 void VideoDisplayWidget::on_comboBox_video_fps_currentIndexChanged(int index)
 {
-    int fps = (index == 0) ? 30 : 60;
-    setFPS(fps);
-    qDebug() << "FPS changed to" << fps;
+//    int fps = (index == 0) ? 30 : 60;
+//    setFPS(fps);
+//    qDebug() << "FPS changed to" << fps;
+    int fps = getSelectedFPS();
+    if (camera) camera->setFPS(fps);
 }
 
 void VideoDisplayWidget::setFPS(int fps)
 {
-    if (cameraDriver) {
-        cameraDriver->setFPS(fps);
+    if (camera) {
+        camera->setFPS(fps);
     }
+}
+
+void VideoDisplayWidget::setResolution(int width, int height)
+{
+    if (!camera) return;
+    camera->setResolution(width, height);
+}
+
+void VideoDisplayWidget::startCamera()
+{
+//    qDebug() << "Camera Started.";
+//    if (camera) {
+//        stopCamera();
+//    }
+//    camera->startCamera();
+    if (cameraRunning) return;
+    int width, height;
+    getSelectedResolution(width, height);
+    int fps = getSelectedFPS();
+
+    qDebug() << "Starting camera with resolution" << width << "x" << height << "FPS:" << fps;
+
+    if (!camera) {
+        camera = new CameraDriver(0, fps, width, height, nullptr);
+        processor = new VideoProcessor(nullptr);
+        connect(camera, &CameraDriver::frameReady, processor, &VideoProcessor::processFrame);
+        connect(processor, &VideoProcessor::processedFrameReady, this, &VideoDisplayWidget::updateFrame);
+    }
+
+    camera->setResolution(width, height);
+    camera->setFPS(fps);
+    camera->startCamera();
+
+    cameraRunning = true;
+}
+
+void VideoDisplayWidget::stopCamera()
+{
+    if (!cameraRunning) return;
+
+    qDebug() << "Stopping camera";
+
+    if (camera) {
+        camera->stopCamera();
+        camera->deleteLater();
+        processor->deleteLater();
+        camera = nullptr;
+        processor = nullptr;
+    }
+
+    cameraRunning = false;
+}
+
+int VideoDisplayWidget::getSelectedFPS() const
+{
+    return (comboBox_video_fps->currentIndex() == 0) ? 30 : 60;
+}
+
+void VideoDisplayWidget::getSelectedResolution(int &width, int &height) const
+{
+    if (comboBox_resolution->currentIndex() == 0) {
+        width = 800;
+        height = 600;
+    } else {
+        width = 1024;
+        height = 720;
+    }
+}
+
+void VideoDisplayWidget::toggleCamera(bool enable)
+{
+    if (enable)
+        startCamera();
+    else
+        stopCamera();
 }
 
 // Update the video frame
 void VideoDisplayWidget::updateFrame(const QImage &frame)
 {
-    image = frame;
-    label_video_display->setPixmap(QPixmap::fromImage(image).scaled(label_video_display->size(),
+    label_video_display->setPixmap(QPixmap::fromImage(frame).scaled(label_video_display->size(),
                                                                     Qt::KeepAspectRatio,
                                                                     Qt::SmoothTransformation));
-}
-
-void VideoDisplayWidget::start(int cameraIndex)
-{
-    if (cameraDriver) {
-        stop();
-    }
-
-    cameraDriver = new CameraDriver(cameraIndex);
-    connect(cameraDriver, &CameraDriver::frameReady, this, &VideoDisplayWidget::updateFrame);
-    cameraDriver->start();
-}
-
-void VideoDisplayWidget::stop()
-{
-    if (cameraDriver) {
-        cameraDriver->stop();
-        cameraDriver->wait();
-        delete cameraDriver;
-        cameraDriver = nullptr;
-    }
 }

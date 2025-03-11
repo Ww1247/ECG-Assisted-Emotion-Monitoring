@@ -6,6 +6,8 @@
 #include <QVBoxLayout>
 #include <QStatusBar>
 #include <QThread>
+#include <QList>
+#include <opencv2/opencv.hpp>
 
 #include "dashboard.h"
 #include "video_display.h"
@@ -24,15 +26,22 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+    void errorOccurred(const QString &error_type, const QString &error_message);
+
     void on_pushbutton_emotion_detection_start_clicked();
     void on_pushbutton_emotion_detection_stop_clicked();
-
-public slots:
-
 
 private:
     void UI_SetUp();
     bool initialize_GPIO();
+    bool initialize_Camera();
+    bool initialize_SensorReading();
+    void run_GPIO_Initialize();
+    void run_Camera_Initialize();
+    void run_Sensor_Read();
+    void display_info(const QString &function_selecte, const QString &info);
+
     DashboardWidget *dashboardWidget;
     VideoDisplayWidget *videoDisplayWidget;
     EmotionIndicatorWidget *emotionIndicatorWidget;
@@ -44,10 +53,8 @@ private:
 private slots:
 
 signals:
-    void sig_sendSystemInfoToReplace(const QString &message);
-    void sig_sendSysteminfoToAppend(const QString &message);
-    void sig_videoCaptureStart();
     void sig_videoCaptureStop();
+    void sig_videoCaptureStart(int camera_index);
 
 };
 

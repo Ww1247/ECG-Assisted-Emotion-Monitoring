@@ -5,7 +5,6 @@
 #include <QFuture>
 #include <QFutureWatcher>
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -13,15 +12,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_start, this, &MainWindow::on_pushbutton_emotion_detection_start_clicked);
     connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_stop, this, &MainWindow::on_pushbutton_emotion_detection_stop_clicked);
-    connect(this, &MainWindow::sig_sendSystemInfoToReplace, emotionIndicatorWidget, &EmotionIndicatorWidget::replace_textEditInfo_Display);
-    connect(this, &MainWindow::sig_sendSysteminfoToAppend, emotionIndicatorWidget, &EmotionIndicatorWidget::append_textEditInfo_Display);
-    connect(this, &MainWindow::sig_videoCaptureStart, videoDisplayWidget, &VideoDisplayWidget::initCamera);
+
+//    connect(this, &MainWindow::sig_videoCaptureStart, videoDisplayWidget, &VideoDisplayWidget::cameraStart);
+//    connect(this, &MainWindow::sig_videoCaptureStop, videoDisplayWidget, &VideoDisplayWidget::cameraStop);
+
+//    connect(sensorAHT20Widget, &SensorAHT20Widget::sig_errorOccurred, this, &MainWindow::errorOccurred); // Error message from other wedgit
 }
 
 MainWindow::~MainWindow()
 {
     // No need to delete UI here, as it is handled by Qt's parent-child memory management
+    qDebug() << "System Stoped";
     qDebug() << "Windows Closed.";
+
+    gpioTerminate();
 }
 
 void MainWindow::UI_SetUp()
@@ -77,32 +81,51 @@ void MainWindow::UI_SetUp()
 
 void MainWindow::on_pushbutton_emotion_detection_start_clicked()
 {
-    qDebug() << "System Start";
-
-    QFutureWatcher<bool> *watcher = new QFutureWatcher<bool>(this);
-
-    connect(watcher, &QFutureWatcher<bool>::finished, this, [=]() {
-        bool success = watcher->future().result();
-
-        if (success) {
-            dashboardWidget->set_pushbuton_enable_start();
-            emit sig_sendSysteminfoToAppend("Pigpio initialized successfully");
-            emit sig_videoCaptureStart();
-        }
-        else {
-            QMessageBox::critical(this, "GPIO ERROR", "Failed to initialize pigpio after 5 attempts.");
-            dashboardWidget->set_pushbuton_enable_stop();
-        }
-        watcher->deleteLater();
-    });
-
-    QFuture<bool> future = QtConcurrent::run(this, &MainWindow::initialize_GPIO);
-    watcher->setFuture(future);
+    display_info("append", "System Start");
+    run_GPIO_Initialize();
 }
 
 void MainWindow::on_pushbutton_emotion_detection_stop_clicked()
 {
-    qDebug() << "System Stop";
+    display_info("append", "System Stop");
+}
+
+void MainWindow::run_GPIO_Initialize()
+{
+    QFutureWatcher<bool> *watcher = new QFutureWatcher<bool>(this);
+    connect(watcher, &QFutureWatcher<bool>::finished, this, [=]() {
+        bool success = watcher->future().result();
+        if (success) {
+            this->run_Camera_Initialize();
+        }
+        else {
+            errorOccurred("GPIO ERROR", "Failed to initialize pigpio after 5 attempts.");
+        }
+        watcher->deleteLater();
+    });
+    QFuture<bool> future = QtConcurrent::run(this, &MainWindow::initialize_GPIO);
+    watcher->setFuture(future);
+}
+
+void MainWindow::run_Camera_Initialize()
+{
+    display_info("append", "Open Camera ...");
+    if (!initialize_Camera()) {
+        errorOccurred("CAMERA ERROR", "Failed to initialize camera.");
+        return;
+    }
+    display_info("append", "Camera open successfully!");
+    run_Sensor_Read();
+}
+
+void MainWindow::run_Sensor_Read()
+{
+    display_info("append", "Turn On Sensor Reading ...");
+    if (!initialize_SensorReading()) {
+        errorOccurred("SENSOR ERROR", "Failed to read form sensor.");
+        return;
+    }
+    display_info("append", "Sensor reading started.");
 }
 
 bool MainWindow::initialize_GPIO()
@@ -114,13 +137,52 @@ bool MainWindow::initialize_GPIO()
         if (gpioInitialise() < 0) {
             QThread::sleep(1);
             retryCount++;
-            emit sig_sendSystemInfoToReplace("Failed to initialize pigpio. Retrying " + QString::number(retryCount) + " attempts.");
+            display_info("replace", "Failed to initialize pigpio. Retrying " + QString::number(retryCount) + " attempts.");
             continue;
         }
-        qDebug() << "Pigpio initialized successfully";
+        display_info("append", "Pigpio initialized successfully!");
         return true;
     }
-
-    qDebug() << "Failed to initialize pigpio after 5 attempts.";
+    display_info("replace", "Failed to initialize pigpio after 5 attempts.");
     return false;
+}
+
+bool MainWindow::initialize_Camera()
+{
+    // emit sig_videoCaptureStart(0);
+    videoDisplayWidget->toggleCamera(true);
+    return true;
+}
+
+bool MainWindow::initialize_SensorReading()
+{
+    return false;
+}
+
+void MainWindow::errorOccurred(const QString &error_type, const QString &error_message)
+{
+    QMessageBox::critical(this, error_type, error_message);
+    dashboardWidget->set_pushbuton_enable_stop();
+    display_info("clear","");
+    return;
+}
+
+void MainWindow::display_info(const QString &function_select, const QString &info)
+{
+    if (function_select == "replace") {
+        emotionIndicatorWidget->replace_textEditInfo_Display("[LOG]: " + info);
+    }
+    else if (function_select == "append") {
+        emotionIndicatorWidget->append_textEditInfo_Display("[LOG]: " + info);
+    }
+    else if (function_select == "error") {
+        emotionIndicatorWidget->replace_textEditInfo_Display("info");
+        qDebug() << "[ERROR]: " + info;
+        return;
+    }
+    else if (function_select == "clear") {
+        emotionIndicatorWidget->replace_textEditInfo_Display("");
+    }
+    qDebug() << "[LOG]: " + info;
+    return;
 }

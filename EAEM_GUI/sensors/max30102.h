@@ -17,6 +17,7 @@ public slots:
     void process();
     void stop();
 
+    bool initialize();
     void setMode(quint8 mode);  // Set working mode (HR, SPO2, Multi-LED)
     void setSamplingRate(quint8 rate);  // Adjust sample rate
     void setLEDPulseAmplitude(quint8 amplitude);  // Adjust LED brightness
@@ -26,7 +27,6 @@ private:
     QAtomicInt keepRunning_;
     int deviceAddress_;
 
-    bool initialize();
     QByteArray readSensorData();
 
 signals:

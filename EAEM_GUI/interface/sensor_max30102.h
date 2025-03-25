@@ -26,6 +26,7 @@ public:
 
     bool sensorReadStart();
     bool sensorReadStop();
+    void sensorInit();
 
 private:
     void initUI();
@@ -57,6 +58,7 @@ private slots:
 
 signals:
     void sig_max30102_errorOccurred(const QString &error_message);
+    void sig_max30102_sensorInit();
 
 };
 

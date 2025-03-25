@@ -65,7 +65,7 @@ bool AHT20::initialize()
         QThread::msleep(10); // Wait for initialization
     }
 
-    qDebug() << "AHT20 initialized successfully.";
+    qDebug() << "[LOG]: AHT20 initialized successfully.";
     return true;
 }
 
@@ -75,7 +75,8 @@ bool AHT20::initialize()
  */
 void AHT20::startMonitorSensor()
 {
-//    keepRunning_ = true;
+    qDebug() << "[LOG]: AHT20 reading start.";
+    keepRunning_ = true;
     while (keepRunning_) {
         if (checkSensorReady()) {
             float temperature, humidity;
@@ -107,6 +108,7 @@ void AHT20::startMonitorSensor()
             temperature = ((rawTemperature * 200.0) / 1048576.0) - 50.0;
 
             // Emit signal with new data
+//            qDebug() << temperature << ", " << humidity;
             emit dataReady(temperature, humidity);
         }
 

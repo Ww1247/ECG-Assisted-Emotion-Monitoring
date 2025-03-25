@@ -30,7 +30,7 @@ bool I2CDriver::initialize()
         emit errorOccurred("Failed to Open I2C Device" + intToHex(deviceAddress_));
         return false;
     }
-    qDebug() << "[INFO]: I2C Device Opened:" << intToHex(deviceAddress_);
+    qDebug() << "[LOG]: I2C Device Opened:" << intToHex(deviceAddress_);
     return true;
 }
 
@@ -40,7 +40,7 @@ bool I2CDriver::close()
     if (i2cHandle_ >= 0) {
         i2cClose(i2cHandle_);
         i2cHandle_ = -1;
-        qDebug() << "[INFO]: I2C driver closed successfully";
+        qDebug() << "[LOG]: I2C driver closed successfully";
         return true;
     }
     qDebug() << "[WARNING]: I2C driver already closed or not initialized";

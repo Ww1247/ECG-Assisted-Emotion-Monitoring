@@ -1,5 +1,6 @@
 #include "max30102.h"
 #include <QThread>
+#include <QDebug>
 
 MAX30102::MAX30102(int deviceAddress, QObject *parent)
     : QObject(parent),
@@ -7,11 +8,13 @@ MAX30102::MAX30102(int deviceAddress, QObject *parent)
       keepRunning_(false)
 {
     i2cDriver = new I2CDriver(deviceAddress_, this);
+    qDebug() << "[LOG]: MAX30102 current thread: " << QThread::currentThreadId();
 }
 
 MAX30102::~MAX30102()
 {
-    i2cDriver->close(); // Ensure the I2C interface is properly closed on deletion
+//    i2cDriver->close(); // Ensure the I2C interface is properly closed on deletion
+    qDebug() << "[LOG]: MAX30102 Distructed";
 }
 
 void MAX30102::process()
@@ -67,7 +70,7 @@ bool MAX30102::initialize()
         emit errorOccurred("Failed to set LED pulse amplitude.");
         return false;
     }
-
+    qDebug() << "[LOG]: MAX30102 initial successfully";
     return true;
 }
 

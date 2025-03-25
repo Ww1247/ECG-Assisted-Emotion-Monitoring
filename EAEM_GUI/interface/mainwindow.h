@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QStatusBar>
 #include <QThread>
+#include <QTimer>
 #include <QList>
 #include <opencv2/opencv.hpp>
 
@@ -40,7 +41,7 @@ private:
     void run_GPIO_Initialize();
     void run_Camera_Initialize();
     void run_Sensor_Read();
-    void display_info(const QString &function_selecte, const QString &info);
+    QString display_info(const QString &function_selecte, const QString &info);
 
     DashboardWidget *dashboardWidget;
     VideoDisplayWidget *videoDisplayWidget;
@@ -55,6 +56,8 @@ private slots:
 signals:
     void sig_videoCaptureStop();
     void sig_videoCaptureStart(int camera_index);
+    void sig_initSensorMAX30102();
+    void sig_startSensorAHT20Thread();
 
 };
 

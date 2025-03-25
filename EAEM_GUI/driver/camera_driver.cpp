@@ -8,14 +8,8 @@ CameraDriver::CameraDriver(int cameraIndex, int fps, int width, int height, QObj
       fps(fps),
       width(width),
       height(height),
-      running_(false),
-      cameraThread_(new QThread(this))
-{
-    moveToThread(cameraThread_);
-    connect(cameraThread_, &QThread::started, this, &CameraDriver::process);
-    connect(this, &CameraDriver::stopped, cameraThread_, &QThread::quit);
-    connect(cameraThread_, &QThread::finished, cameraThread_, &QThread::deleteLater);
-}
+      running_(false)
+{}
 
 // Destructor
 CameraDriver::~CameraDriver()
@@ -23,31 +17,22 @@ CameraDriver::~CameraDriver()
     stopCamera();
 }
 
-// Start thread
-void CameraDriver::startCamera()
-{
-    if (!cameraThread_->isRunning()) {
-        cameraThread_->start();
-    }
-}
-
 // Stop thread
 void CameraDriver::stopCamera()
 {
-    if (running_) {
-        running_ = false;
-        emit stopped();
-        qDebug() << "Camera thread stopped";
-    }
+    qDebug() << "[LOG]: Camera thread stopped";
+    running_.store(false, std::memory_order_relaxed);
+    wait();
+    emit sig_cameraStopped();
 }
 
 // Run in thread
-void CameraDriver::process()
+void CameraDriver::run()
 {
     cap.open(cameraIndex, cv::CAP_V4L2); // Turn on camera
 
     if (!cap.isOpened()) {
-        qDebug() << "Error: Cannot open camera!";
+        qDebug() << "[Error]: Cannot open camera";
         return;
     }
     cap.set(cv::CAP_PROP_FRAME_WIDTH, width.load());
@@ -61,7 +46,7 @@ void CameraDriver::process()
         cv::Mat frame;
         cap >> frame;
         if (frame.empty()) {
-            qDebug() << "Warning: Empty frame received!";
+            qDebug() << "[WARNING]: Empty frame received!";
             QThread::msleep(500);
             continue;
         }
@@ -86,9 +71,9 @@ void CameraDriver::setFPS(int newFPS)
     fps.store(newFPS, std::memory_order_relaxed);
     if (cap.isOpened()) {
         if (!cap.set(cv::CAP_PROP_FPS, fps.load())) {
-            qDebug() << "Warning: CAP_PROP_FPS not supported by this camera.";
+            qDebug() << "[WARNING]: CAP_PROP_FPS not supported by this camera.";
         } else {
-            qDebug() << "Updated FPS to" << fps.load();
+            qDebug() << "[USER]: Updated FPS to" << fps.load();
         }
     }
 }
@@ -102,14 +87,14 @@ void CameraDriver::setResolution(int newWidth, int newHeight)
     height.store(newHeight, std::memory_order_relaxed);
 
     if (cap.isOpened()) {
-        qDebug() << "Restarting camera with new resolution: " << width.load() << "x" << height.load();
+        qDebug() << "[LOG]: Restarting camera with new resolution: " << width.load() << "x" << height.load();
 
         cap.release(); // Release the current camera completely
         QThread::msleep(100); // Wait 100ms for the camera to reinitialize
         cap.open(cameraIndex, cv::CAP_V4L2); // Turn the camera back on
 
         if (!cap.isOpened()) {
-            qDebug() << "Error: Could not reopen camera after resolution change!";
+            qDebug() << "[Error]: Could not reopen camera after resolution change!";
             return;
         }
 

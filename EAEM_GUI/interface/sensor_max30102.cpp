@@ -7,25 +7,16 @@ SensorMAX30102Widget::SensorMAX30102Widget(QWidget *parent)
     : QWidget(parent)
 {
     initUI();
-
-//    i2cDriver_ = new MAX30102(0x57);
-//    sensorThread = new QThread(this);
-//    i2cDriver_->moveToThread(sensorThread);
-
-//    connect(, QOverload<int>::of(&QComboBox::currentIndexChanged),
-//               [=](int index){ sensor->setMode(static_cast<quint8>(index + 2)); });
-
-//    connect(ui->samplingRateSlider, &QSlider::valueChanged,
-//               [=](int value){ sensor->setSamplingRate(static_cast<quint8>(value)); });
-
-//    connect(ui->ledBrightnessSlider, &QSlider::valueChanged,
-//               [=](int value){ sensor->setLEDPulseAmplitude(static_cast<quint8>(value)); });
-
 }
 
 SensorMAX30102Widget::~SensorMAX30102Widget()
 {
-//    sensorReadStop();
+    sensorReadStop();
+
+    sensorThread->quit();
+    sensorThread->wait();
+    delete sensor;
+    qDebug() << "[LOG]: SensorMAX30102Widget Distructed";
 }
 
 
@@ -126,31 +117,42 @@ void SensorMAX30102Widget::initUI()
     setLayout(mainLayout);
 }
 
+void SensorMAX30102Widget::sensorInit()
+{
+    sensor = new MAX30102(0x57);
+    sensorThread = new QThread(this);
+    sensor->moveToThread(sensorThread);
+    sensorThread->start();
+
+    connect(this, &SensorMAX30102Widget::sig_max30102_sensorInit, sensor, &MAX30102::initialize);
+    emit sig_max30102_sensorInit();
+}
+
 void SensorMAX30102Widget::on_comboBox_sampling_rate_currentIndexChanged(int index)
 {
-    qDebug() << "Sampling Rate Index" << index;
+    qDebug() << "[LOG]: Sampling Rate Index" << index;
 }
 
 void SensorMAX30102Widget::on_comboBox_led_red_currentIndexChanged(int index)
 {
-    qDebug() << "LED RED Index" << index;
+    qDebug() << "[LOG]: LED RED Index" << index;
 }
 
 void SensorMAX30102Widget::on_comboBox_led_ir_currentIndexChanged(int index)
 {
-    qDebug() << "LED IR Index" << index;
+    qDebug() << "[LOG]: LED IR Index" << index;
 }
 
 // Slot function for heart rate slider value change
 void SensorMAX30102Widget::on_slider_heart_rate_changed(int value)
 {
-    qDebug() << "Heart Rate:" << value;
+    qDebug() << "[LOG]: Heart Rate:" << value;
 }
 
 // Slot function for blood oxygen slider value change
 void SensorMAX30102Widget::on_slider_blood_oxygen_changed(int value)
 {
-    qDebug() << "Blood Oxygen:" << value << "%";
+    qDebug() << "[LOG]: Blood Oxygen:" << value << "%";
 }
 
 // Slot function to handle mode selection
@@ -172,12 +174,12 @@ void SensorMAX30102Widget::on_checkBox_mode_changed(bool checked)
 
 bool SensorMAX30102Widget::sensorReadStart()
 {
-    qDebug() << "MAX30102 Sensor Read Start.";
+    qDebug() << "[LOG]: MAX30102 Sensor Read Start.";
     return true;
 }
 
 bool SensorMAX30102Widget::sensorReadStop()
 {
-    qDebug() << "MAX30102 Sensor Read Stop.";
+    qDebug() << "[LOG]: MAX30102 Sensor Read Stop.";
     return true;
 }

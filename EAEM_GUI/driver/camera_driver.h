@@ -11,15 +11,17 @@ class CameraDriver : public QThread
 {
     Q_OBJECT
 
+protected:
+    void run() override;
+
 public:
-    CameraDriver(int cameraIndex,
-                 int fps,
-                 int width,
-                 int height,
+    CameraDriver(int cameraIndex = 0,
+                 int fps = 30,
+                 int width = 640,
+                 int height = 480,
                  QObject *parent = nullptr);
     ~CameraDriver();
 
-    void startCamera();
     void stopCamera();
     void setFPS(int newFPS);      // Set the frame rate
     void setResolution(int width, int newHeight); // Set the resolution
@@ -35,11 +37,11 @@ private:
     QThread *cameraThread_;
 
 private slots:
-    void process();
+
 
 signals:
     void frameReady(const QImage &frame);  // Signal to send processed frames
-    void stopped();
+    void sig_cameraStopped();
 };
 
 #endif // CAMERATHREAD_H

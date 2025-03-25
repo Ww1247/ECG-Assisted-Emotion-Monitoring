@@ -13,19 +13,24 @@ MainWindow::MainWindow(QWidget *parent)
     connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_start, this, &MainWindow::on_pushbutton_emotion_detection_start_clicked);
     connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_stop, this, &MainWindow::on_pushbutton_emotion_detection_stop_clicked);
 
-//    connect(this, &MainWindow::sig_videoCaptureStart, videoDisplayWidget, &VideoDisplayWidget::cameraStart);
-//    connect(this, &MainWindow::sig_videoCaptureStop, videoDisplayWidget, &VideoDisplayWidget::cameraStop);
+    connect(this, &MainWindow::sig_videoCaptureStart, videoDisplayWidget, &VideoDisplayWidget::initCamera);
+    connect(this, &MainWindow::sig_videoCaptureStop, videoDisplayWidget, &VideoDisplayWidget::stopCamera);
 
-//    connect(sensorAHT20Widget, &SensorAHT20Widget::sig_errorOccurred, this, &MainWindow::errorOccurred); // Error message from other wedgit
+    connect(this, &MainWindow::sig_initSensorMAX30102, sensorMAX30102Widget, &SensorMAX30102Widget::sensorInit);
+
+    connect(this, &MainWindow::sig_startSensorAHT20Thread, sensorAHT20Widget, &SensorAHT20Widget::startSensorThread);
+
+    qAddPostRoutine([](){
+        gpioTerminate();
+        qDebug() << "[LOG]: gpioTerminate called at post-routine shutdown.";
+    });
 }
 
 MainWindow::~MainWindow()
 {
     // No need to delete UI here, as it is handled by Qt's parent-child memory management
-    qDebug() << "System Stoped";
-    qDebug() << "Windows Closed.";
-
-    gpioTerminate();
+    qDebug() << "[LOG]: System Stoped";
+    qDebug() << "[LOG]: Windows Closed.";
 }
 
 void MainWindow::UI_SetUp()
@@ -81,13 +86,14 @@ void MainWindow::UI_SetUp()
 
 void MainWindow::on_pushbutton_emotion_detection_start_clicked()
 {
-    display_info("append", "System Start");
+    qDebug() << "[LOG]: System Start";
     run_GPIO_Initialize();
 }
 
 void MainWindow::on_pushbutton_emotion_detection_stop_clicked()
 {
     display_info("append", "System Stop");
+    emit sig_videoCaptureStop();
 }
 
 void MainWindow::run_GPIO_Initialize()
@@ -109,23 +115,24 @@ void MainWindow::run_GPIO_Initialize()
 
 void MainWindow::run_Camera_Initialize()
 {
-    display_info("append", "Open Camera ...");
+    qDebug() << "[LOG]: Open Camera ...";
     if (!initialize_Camera()) {
+        qDebug() << "[ERROR]: Failed to initialize camera.";
         errorOccurred("CAMERA ERROR", "Failed to initialize camera.");
         return;
     }
-    display_info("append", "Camera open successfully!");
+    qDebug() << "[LOG]: Camera open successfully!";
     run_Sensor_Read();
 }
 
 void MainWindow::run_Sensor_Read()
 {
-    display_info("append", "Turn On Sensor Reading ...");
+    qDebug() << "[LOG]: Turn On Sensor Reading ...";
     if (!initialize_SensorReading()) {
         errorOccurred("SENSOR ERROR", "Failed to read form sensor.");
         return;
     }
-    display_info("append", "Sensor reading started.");
+    qDebug() << "[LOG]: Sensor reading started.";
 }
 
 bool MainWindow::initialize_GPIO()
@@ -137,26 +144,33 @@ bool MainWindow::initialize_GPIO()
         if (gpioInitialise() < 0) {
             QThread::sleep(1);
             retryCount++;
-            display_info("replace", "Failed to initialize pigpio. Retrying " + QString::number(retryCount) + " attempts.");
+//            display_info("replace", "Failed to initialize pigpio. Retrying " + QString::number(retryCount) + " attempts.");
+            qDebug() << "[ERROR]: Failed to initialize pigpio. Retrying " << retryCount << " attempts.";
             continue;
         }
-        display_info("append", "Pigpio initialized successfully!");
+//        display_info("append", "Pigpio initialized successfully!");
+        qDebug() << "[LOG]: Pigpio initialized successfully!";
         return true;
     }
-    display_info("replace", "Failed to initialize pigpio after 5 attempts.");
+//    display_info("replace", "Failed to initialize pigpio after 5 attempts.");
+    qDebug() << "[ERROR]: Failed to initialize pigpio after 5 attempts.";
     return false;
 }
 
 bool MainWindow::initialize_Camera()
 {
-    // emit sig_videoCaptureStart(0);
-    videoDisplayWidget->toggleCamera(true);
+    emit sig_videoCaptureStart(0);
     return true;
 }
 
 bool MainWindow::initialize_SensorReading()
 {
-    return false;
+//    QMetaObject::invokeMethod(sensorMAX30102Widget, "isSensorReady",
+//                              Qt::BlockingQueuedConnection,
+//                              Q_RETURN_ARG(bool, ready));
+//    emit sig_initSensorMAX30102();
+    emit sig_startSensorAHT20Thread();
+    return true;
 }
 
 void MainWindow::errorOccurred(const QString &error_type, const QString &error_message)
@@ -167,7 +181,7 @@ void MainWindow::errorOccurred(const QString &error_type, const QString &error_m
     return;
 }
 
-void MainWindow::display_info(const QString &function_select, const QString &info)
+QString MainWindow::display_info(const QString &function_select, const QString &info)
 {
     if (function_select == "replace") {
         emotionIndicatorWidget->replace_textEditInfo_Display("[LOG]: " + info);
@@ -177,12 +191,10 @@ void MainWindow::display_info(const QString &function_select, const QString &inf
     }
     else if (function_select == "error") {
         emotionIndicatorWidget->replace_textEditInfo_Display("info");
-        qDebug() << "[ERROR]: " + info;
-        return;
+        return "error";
     }
     else if (function_select == "clear") {
         emotionIndicatorWidget->replace_textEditInfo_Display("");
     }
-    qDebug() << "[LOG]: " + info;
-    return;
+    return info;
 }

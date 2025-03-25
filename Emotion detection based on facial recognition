@@ -1,0 +1,67 @@
+#include <iostream>
+#include <opencv2/opencv.hpp>
+#include <dlib/image_processing/frontal_face_detector.h>
+#include <dlib/image_processing.h>
+#include <dlib/opencv.h>
+#include <thread>
+
+using namespace std;
+using namespace cv;
+using namespace dlib;
+
+// Calculate the Euclidean distance between two points
+double euclidean_distance(point p1, point p2) {
+    return sqrt(pow(p1.x() - p2.x(), 2) + pow(p1.y() - p2.y(), 2));
+}
+
+// Recognize facial expressions
+string recognize_expression(full_object_detection shape) {
+    double mouth_open = euclidean_distance(shape.part(62), shape.part(66));
+    double smile_width = euclidean_distance(shape.part(48), shape.part(54));
+    double eyebrow_raise = shape.part(24).y() - shape.part(19).y();
+
+    if (mouth_open > 20) return "surprise";
+    if (smile_width > 50) return "smile";
+    if (eyebrow_raise > 10) return "angry";
+    
+    return "neutral";
+}
+
+int main(int argc, char** argv) {
+    if (argc < 2) {
+        cerr << "usage: " << argv[0] << " <Image Path>" << endl;
+        return 1;
+    }
+
+    // Loading face detector and feature point model
+    frontal_face_detector detector = get_frontal_face_detector();
+    shape_predictor sp;
+    deserialize("shape_predictor_68_face_landmarks.dat") >> sp;
+
+    // Reading an Image
+    Mat img = imread(argv[1]);
+    if (img.empty()) {
+        cerr << "Unable to load image: " << argv[1] << endl;
+        return 1;
+    }
+
+    // Convert to Dlib format  right here!
+    cv_image<bgr_pixel> dlib_img(img);
+    
+    
+    // Perform face detection The problem may be dlib_img NOT cv_image<bgr_pixel>，Need to convert the format correctly：cv::Mat img = cv::imread("image.jpg"); cv_image<bgr_pixel> dlib_img(img); std::vector<dlib::rectangle> faces = detector(dlib_img); but right here!
+
+    std::vector<dlib::rectangle> faces = detector(dlib_img);
+    cout << "detect " << faces.size() << " face" << endl;
+    
+    for (auto face : faces) {
+        full_object_detection shape = sp(dlib_img, face);
+        string expression = recognize_expression(shape);
+        cout << "Recognized expressions: " << expression << endl;
+    }
+    
+    return 0;
+}
+
+
+

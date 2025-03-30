@@ -32,7 +32,7 @@ void EcgHrvWidget::initUI()
     layout_ECG->setContentsMargins(0, 0, 0, 0); // Remove margins
     layout_ECG->setSpacing(0); // Remove spacing
 
-    QCustomPlot *customPlot_ECG = new QCustomPlot(frame_ECG);
+    customPlot_ECG = new QCustomPlot(frame_ECG);
     frame_ECG->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout_ECG->addWidget(customPlot_ECG);
 
@@ -69,7 +69,7 @@ void EcgHrvWidget::initUI()
     layout_HRV->setContentsMargins(0, 0, 0, 0); // Remove margins
     layout_HRV->setSpacing(0); // Remove spacing
 
-    QCustomPlot *customPlot_HRV = new QCustomPlot(frame_HRV);
+    customPlot_HRV = new QCustomPlot(frame_HRV);
     frame_HRV->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout_HRV->addWidget(customPlot_HRV);
 
@@ -88,6 +88,8 @@ void EcgHrvWidget::initUI()
     horizontalLayout_MAX30102->addWidget(groupBox_HRV);
 
     setLayout(horizontalLayout_MAX30102);
+
+    elapsed_.start();
 }
 
 // Function to initialize QCustomPlot settings
@@ -144,3 +146,73 @@ void EcgHrvWidget::set_UI_EnableDisable(const bool &status)
     radioButton_HRV_SDNN->setEnabled(status);
     radioButton_HRV_LF_HF->setEnabled(status);
 }
+
+void EcgHrvWidget::addECGData(float heartRate, float spo2)
+{
+    double t = elapsed_.elapsed();
+    time_ << t;
+    ecgData_ << heartRate;
+    spo2Data_ << spo2;
+    avgHRData_ << (ecgData_.size() > 0 ? std::accumulate(ecgData_.begin(), ecgData_.end(), 0.0) / ecgData_.size() : heartRate);
+
+    // Refresh data
+    while (time_.size() > maxPoints_) {
+        time_.removeFirst();
+        ecgData_.removeFirst();
+        spo2Data_.removeFirst();
+        avgHRData_.removeFirst();
+    }
+}
+
+void EcgHrvWidget::addHRVData(float rmssd, float sdnn, float lf_hf)
+{
+    hrvRMSSD_ << rmssd;
+    hrvSDNN_ << sdnn;
+    hrvLFHF_ << lf_hf;
+
+    while (hrvRMSSD_.size() > maxPoints_) {
+        hrvRMSSD_.removeFirst();
+        hrvSDNN_.removeFirst();
+        hrvLFHF_.removeFirst();
+    }
+}
+
+void EcgHrvWidget::updatePlots()
+{
+    if (time_.isEmpty()) return;
+    double now = time_.last();
+
+    // ECG Curve
+    if (radioButton_ECG_display->isChecked())
+        customPlot_ECG->graph(0)->setData(time_, ecgData_);
+    else if (radioButton_blood_oxygen_display->isChecked())
+        customPlot_ECG->graph(0)->setData(time_, spo2Data_);
+    else
+        customPlot_ECG->graph(0)->setData(time_, avgHRData_);
+
+    customPlot_ECG->xAxis->setRange(now - 5000, now);
+    customPlot_ECG->yAxis->rescale();
+    customPlot_ECG->replot(QCustomPlot::rpQueuedReplot);
+
+    // HRV Curve
+    QVector<double> x(hrvRMSSD_.size());
+    for (int i = 0; i < x.size(); ++i)
+        x[i] = i;
+
+    if (radioButton_HRV_RMSSD->isChecked())
+        customPlot_HRV->graph(0)->setData(x, hrvRMSSD_);
+    else if (radioButton_HRV_SDNN->isChecked())
+        customPlot_HRV->graph(0)->setData(x, hrvSDNN_);
+    else
+        customPlot_HRV->graph(0)->setData(x, hrvLFHF_);
+
+    customPlot_HRV->xAxis->setRange(0, hrvRMSSD_.size());
+    customPlot_HRV->yAxis->rescale();
+    customPlot_HRV->replot(QCustomPlot::rpQueuedReplot);
+}
+
+void EcgHrvWidget::updatePlot()
+{
+    updatePlots();  // Timed refresh function
+}
+

@@ -17,7 +17,11 @@
 #include "sensor_aht20.h"
 #include "ecg_hrv.h"
 #include "temperature_humidity.h"
-
+#include "sensor_manager.h"
+#include "aht20.h"
+#include "max30102.h"
+#include "i2c_driver.h"
+#include "plot_refresh_manager.h"
 
 class MainWindow : public QMainWindow
 {
@@ -29,18 +33,17 @@ public:
 
 public slots:
     void errorOccurred(const QString &error_type, const QString &error_message);
-
     void on_pushbutton_emotion_detection_start_clicked();
     void on_pushbutton_emotion_detection_stop_clicked();
 
 private:
     void UI_SetUp();
+    void initialize_SignalConnection();
     bool initialize_GPIO();
-    bool initialize_Camera();
-    bool initialize_SensorReading();
     void run_GPIO_Initialize();
-    void run_Camera_Initialize();
-    void run_Sensor_Read();
+    void start_Sensor_Read();
+    void stop_Sensor_Read();
+
     QString display_info(const QString &function_selecte, const QString &info);
 
     DashboardWidget *dashboardWidget;
@@ -50,14 +53,13 @@ private:
     SensorAHT20Widget *sensorAHT20Widget;
     EcgHrvWidget *ecgHrvWidget;
     TemperatureHumidityWidget *temperatureHumidityWidget;
-
-private slots:
+    SensorManager *manager = nullptr;
+    PlotRefreshManager *plotManager;
 
 signals:
-    void sig_videoCaptureStop();
-    void sig_videoCaptureStart(int camera_index);
-    void sig_initSensorMAX30102();
-    void sig_startSensorAHT20Thread();
+    void sig_AHT20DataSend(const float &temperature, const float &humidity);
+    void sig_MAX30102DataSend(const float &heartrate, const float &spo2);
+    void sig_CameraDataSend(const QImage &image);
 
 };
 

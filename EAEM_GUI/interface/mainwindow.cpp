@@ -9,25 +9,12 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     UI_SetUp();
-
-    connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_start, this, &MainWindow::on_pushbutton_emotion_detection_start_clicked);
-    connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_stop, this, &MainWindow::on_pushbutton_emotion_detection_stop_clicked);
-
-    connect(this, &MainWindow::sig_videoCaptureStart, videoDisplayWidget, &VideoDisplayWidget::initCamera);
-    connect(this, &MainWindow::sig_videoCaptureStop, videoDisplayWidget, &VideoDisplayWidget::stopCamera);
-
-    connect(this, &MainWindow::sig_initSensorMAX30102, sensorMAX30102Widget, &SensorMAX30102Widget::sensorInit);
-
-    connect(this, &MainWindow::sig_startSensorAHT20Thread, sensorAHT20Widget, &SensorAHT20Widget::startSensorThread);
-
-    qAddPostRoutine([](){
-        gpioTerminate();
-        qDebug() << "[LOG]: gpioTerminate called at post-routine shutdown.";
-    });
+    run_GPIO_Initialize();
 }
 
 MainWindow::~MainWindow()
 {
+    stop_Sensor_Read();
     // No need to delete UI here, as it is handled by Qt's parent-child memory management
     qDebug() << "[LOG]: System Stoped";
     qDebug() << "[LOG]: Windows Closed.";
@@ -84,16 +71,98 @@ void MainWindow::UI_SetUp()
     setStatusBar(new QStatusBar(this));
 }
 
+void MainWindow::initialize_SignalConnection()
+{
+    /*SensorManager Instantiation*/
+    manager = new SensorManager(this);
+
+    /*Register AHT20 Sensor*/
+    I2CDriver *i2c_aht20 = new I2CDriver(AHT20_I2C_ADDRESS, this);
+    if (!i2c_aht20->initialize()) {
+        qDebug() << "[ERROR]: AHT20 I2C initialization failed.";
+        delete i2c_aht20;
+        return;
+    }
+    AHT20 *aht20 = new AHT20(i2c_aht20);
+    manager->registerSensor("AHT20", aht20);
+
+    /*Register MAX30102 Sensor*/
+    I2CDriver *i2c_max30102 = new I2CDriver(MAX30102_I2C_ADDRESS, this);
+    if (!i2c_max30102->initialize()) {
+        qDebug() << "[ERROR]: MAX30102 I2C initialization failed.";
+        delete i2c_max30102;
+        return;
+    }
+    MAX30102 *max30102 = new MAX30102(i2c_max30102, this);
+    manager->registerSensor("MAX30102", max30102);
+
+    /*Register Camera Sensor*/
+    CameraDriver *camera = new CameraDriver(0, 30, 640, 480, this);
+    manager->registerSensor("Camera", camera);
+
+    /*Register Plotting Refresh Manager*/
+    plotManager = new PlotRefreshManager(this);
+    plotManager->registerPlot(ecgHrvWidget);
+    plotManager->registerPlot(temperatureHumidityWidget);
+
+    qAddPostRoutine([](){
+        gpioTerminate();
+        qDebug() << "[LOG]: gpioTerminate called at post-routine shutdown.";
+    });
+
+    /*Establish DashboardWidget Signal Connections*/
+    connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_start, this, &MainWindow::on_pushbutton_emotion_detection_start_clicked);
+    connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_stop, this, &MainWindow::on_pushbutton_emotion_detection_stop_clicked);
+
+    connect(this, &MainWindow::sig_AHT20DataSend, sensorAHT20Widget, &SensorAHT20Widget::updateValues);
+    connect(this, &MainWindow::sig_MAX30102DataSend, sensorMAX30102Widget, &SensorMAX30102Widget::updateValues);
+    connect(this, &MainWindow::sig_CameraDataSend, videoDisplayWidget, &VideoDisplayWidget::updateFrame);
+
+    /* SensorManager Data Handling */
+    connect(manager, &SensorManager::dataReady, this, [=](const SensorData &data) {
+        if (data.name == "AHT20") {
+            float t = data.values.value("temperature").toFloat();
+            float h = data.values.value("humidity").toFloat();
+//            sensorAHT20Widget->updateValues(t, h);
+            emit sig_AHT20DataSend(t, h);
+            temperatureHumidityWidget->addData(t, h);
+        } else if (data.name == "MAX30102") {
+            float hr = data.values.value("heartRate").toFloat();
+            float sp = data.values.value("spo2").toFloat();
+            emit sig_MAX30102DataSend(hr, sp);
+            ecgHrvWidget->addECGData(hr, sp);
+//            sensorMAX30102Widget->updateValues(hr, sp);
+        } else if (data.name == "Camera" && !data.image.isNull()) {
+//            videoDisplayWidget->updateFrame(data.image);
+            emit sig_CameraDataSend(data.image);
+        }
+    });
+}
+
 void MainWindow::on_pushbutton_emotion_detection_start_clicked()
 {
     qDebug() << "[LOG]: System Start";
-    run_GPIO_Initialize();
+    start_Sensor_Read();
+}
+
+void MainWindow::start_Sensor_Read()
+{
+    qDebug() << "[LOG]: Turn On Sensor Reading ...";
+    manager->startSensor("AHT20");
+    manager->startSensor("MAX30102");
+    manager->startSensor("Camera");
+    qDebug() << "[LOG]: Sensor reading started.";
 }
 
 void MainWindow::on_pushbutton_emotion_detection_stop_clicked()
 {
     display_info("append", "System Stop");
-    emit sig_videoCaptureStop();
+    stop_Sensor_Read();
+}
+
+void MainWindow::stop_Sensor_Read()
+{
+    manager->stopAll();
 }
 
 void MainWindow::run_GPIO_Initialize()
@@ -102,7 +171,7 @@ void MainWindow::run_GPIO_Initialize()
     connect(watcher, &QFutureWatcher<bool>::finished, this, [=]() {
         bool success = watcher->future().result();
         if (success) {
-            this->run_Camera_Initialize();
+            initialize_SignalConnection();
         }
         else {
             errorOccurred("GPIO ERROR", "Failed to initialize pigpio after 5 attempts.");
@@ -111,28 +180,6 @@ void MainWindow::run_GPIO_Initialize()
     });
     QFuture<bool> future = QtConcurrent::run(this, &MainWindow::initialize_GPIO);
     watcher->setFuture(future);
-}
-
-void MainWindow::run_Camera_Initialize()
-{
-    qDebug() << "[LOG]: Open Camera ...";
-    if (!initialize_Camera()) {
-        qDebug() << "[ERROR]: Failed to initialize camera.";
-        errorOccurred("CAMERA ERROR", "Failed to initialize camera.");
-        return;
-    }
-    qDebug() << "[LOG]: Camera open successfully!";
-    run_Sensor_Read();
-}
-
-void MainWindow::run_Sensor_Read()
-{
-    qDebug() << "[LOG]: Turn On Sensor Reading ...";
-    if (!initialize_SensorReading()) {
-        errorOccurred("SENSOR ERROR", "Failed to read form sensor.");
-        return;
-    }
-    qDebug() << "[LOG]: Sensor reading started.";
 }
 
 bool MainWindow::initialize_GPIO()
@@ -144,33 +191,14 @@ bool MainWindow::initialize_GPIO()
         if (gpioInitialise() < 0) {
             QThread::sleep(1);
             retryCount++;
-//            display_info("replace", "Failed to initialize pigpio. Retrying " + QString::number(retryCount) + " attempts.");
             qDebug() << "[ERROR]: Failed to initialize pigpio. Retrying " << retryCount << " attempts.";
             continue;
         }
-//        display_info("append", "Pigpio initialized successfully!");
         qDebug() << "[LOG]: Pigpio initialized successfully!";
         return true;
     }
-//    display_info("replace", "Failed to initialize pigpio after 5 attempts.");
     qDebug() << "[ERROR]: Failed to initialize pigpio after 5 attempts.";
     return false;
-}
-
-bool MainWindow::initialize_Camera()
-{
-    emit sig_videoCaptureStart(0);
-    return true;
-}
-
-bool MainWindow::initialize_SensorReading()
-{
-//    QMetaObject::invokeMethod(sensorMAX30102Widget, "isSensorReady",
-//                              Qt::BlockingQueuedConnection,
-//                              Q_RETURN_ARG(bool, ready));
-//    emit sig_initSensorMAX30102();
-    emit sig_startSensorAHT20Thread();
-    return true;
 }
 
 void MainWindow::errorOccurred(const QString &error_type, const QString &error_message)

@@ -20,7 +20,7 @@ void TemperatureHumidityWidget::initUI() {
     layout_frame_temperature->setSpacing(0);
 
     // QCustomPlot inside Frame
-    QCustomPlot *customPlot_temperature = new QCustomPlot(frame_temperature);
+    customPlot_temperature = new QCustomPlot(frame_temperature);
     customPlot_temperature->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout_frame_temperature->addWidget(customPlot_temperature);
 
@@ -45,7 +45,7 @@ void TemperatureHumidityWidget::initUI() {
     layout_frame_humidity->setSpacing(0);
 
     // QCustomPlot inside Frame
-    QCustomPlot *customPlot_humidity = new QCustomPlot(frame_humidity);
+    customPlot_humidity = new QCustomPlot(frame_humidity);
     customPlot_humidity->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout_frame_humidity->addWidget(customPlot_humidity);
 
@@ -63,6 +63,9 @@ void TemperatureHumidityWidget::initUI() {
     horizontalLayout_TemperatureHumidity->addWidget(groupBox_humidity);
 
     setLayout(horizontalLayout_TemperatureHumidity);
+
+    // Initialize the timestamp
+    elapsed_.start();
 }
 
 // Function to initialize QCustomPlot settings
@@ -87,4 +90,47 @@ void TemperatureHumidityWidget::setupPlot(QCustomPlot *plot) {
     // customPlot->axisRect()->setRangeDrag(Qt::Horizontal | Qt::Vertical);
     plot->axisRect()->setRangeZoom(Qt::Horizontal);
     plot->axisRect()->setRangeDrag(Qt::Horizontal);
+}
+
+void TemperatureHumidityWidget::addData(float temperature, float humidity)
+{
+    double currentTime = elapsed_.elapsed();  // ms
+
+    timeData_.append(currentTime);
+    temperatureData_.append(temperature);
+    humidityData_.append(humidity);
+
+    // Control the maximum number of data points
+    if (timeData_.size() > maxPoints_) {
+        timeData_.remove(0, timeData_.size() - maxPoints_);
+        temperatureData_.remove(0, temperatureData_.size() - maxPoints_);
+        humidityData_.remove(0, humidityData_.size() - maxPoints_);
+    }
+}
+
+void TemperatureHumidityWidget::updatePlots()
+{
+    if (timeData_.isEmpty()) return;
+
+    // Set data
+    customPlot_temperature->graph(0)->setData(timeData_, temperatureData_);
+    customPlot_humidity->graph(0)->setData(timeData_, humidityData_);
+
+    // Automatically moves the X-axis to display the last data segment
+    double latestTime = timeData_.last();
+    customPlot_temperature->xAxis->setRange(latestTime - 5000, latestTime);  // Show the last 5s
+    customPlot_humidity->xAxis->setRange(latestTime - 5000, latestTime);
+
+    // Automatic Y-axis scaling (optional or fixed range)
+    customPlot_temperature->yAxis->rescale();
+    customPlot_humidity->yAxis->rescale();
+
+    // Refresh
+    customPlot_temperature->replot();
+    customPlot_humidity->replot();
+}
+
+void TemperatureHumidityWidget::updatePlot()
+{
+    updatePlots();
 }

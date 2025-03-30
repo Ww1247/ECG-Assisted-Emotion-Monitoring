@@ -33,7 +33,6 @@ else()
         arithmetic/ecg_analyzer.h arithmetic/ecg_analyzer.cpp
         arithmetic/video_processor.h arithmetic/video_processor.cpp
 
-        driver/plot_driver.h driver/plot_driver.cpp
         driver/qcustomplot.h driver/qcustomplot.cpp
         driver/i2c_driver.h driver/i2c_driver.cpp
         driver/camera_driver.h driver/camera_driver.cpp
@@ -47,8 +46,15 @@ else()
         interface/ecg_hrv.h interface/ecg_hrv.cpp
         interface/temperature_humidity.h interface/temperature_humidity.cpp
 
+        ploting/plot_refresh_interface.h
+        ploting/plot_refresh_manager.h ploting/plot_refresh_manager.cpp
+
         sensors/aht20.h sensors/aht20.cpp
         sensors/max30102.h sensors/max30102.cpp
+        sensors/sensor_interface.h
+        sensors/sensor_data.h
+        sensors/sensor_task.h sensors/sensor_task.cpp
+        sensors/sensor_manager.h sensors/sensor_manager.cpp
     )
 endif()
 
@@ -57,7 +63,8 @@ target_include_directories(EAEM_GUI PRIVATE
         ${CMAKE_SOURCE_DIR}/arithmetic
         ${CMAKE_SOURCE_DIR}/driver
         ${CMAKE_SOURCE_DIR}/interface
-        ${CMAKE_SOURCE_DIR}/sensors       
+        ${CMAKE_SOURCE_DIR}/sensors
+        ${CMAKE_SOURCE_DIR}/ploting
 )
 
 # Link Qt Widgets library

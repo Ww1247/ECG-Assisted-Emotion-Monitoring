@@ -2,16 +2,14 @@
 #include <QDebug>
 
 VideoDisplayWidget::VideoDisplayWidget(QWidget *parent)
-    : QWidget(parent),
-      camera(nullptr)
+    : QWidget(parent)
 {
     initUI();
 }
 
 VideoDisplayWidget::~VideoDisplayWidget()
 {
-    stopCamera();
-    qDebug() << "[LOG]: Video Display Widget End";
+
 }
 
 void VideoDisplayWidget::initUI()
@@ -29,7 +27,6 @@ void VideoDisplayWidget::initUI()
     label_video_display->setMinimumSize(300, 300);
     label_video_display->setAlignment(Qt::AlignCenter);
     label_video_display->setStyleSheet("background-color: black;");
-    connect(camera, &CameraDriver::sig_cameraStopped, this, &VideoDisplayWidget::on_cameraStopped);
 
     // Layout for video display
     QVBoxLayout *layout_video_display = new QVBoxLayout(frame_video_display);
@@ -79,11 +76,6 @@ void VideoDisplayWidget::initUI()
     setLayout(mainLayout);
 }
 
-void VideoDisplayWidget::initCamera()
-{
-    startCamera();
-}
-
 // Handle resolution change
 void VideoDisplayWidget::on_comboBox_resolution_currentIndexChanged(int index)
 {
@@ -93,6 +85,11 @@ void VideoDisplayWidget::on_comboBox_resolution_currentIndexChanged(int index)
         setResolution(1024, 720);
     }
     qDebug() << "[USER]: Resolution changed to" << comboBox_resolution->currentText();
+}
+
+void VideoDisplayWidget::setResolution(int width, int height)
+{
+
 }
 
 // Handle FPS change
@@ -105,48 +102,13 @@ void VideoDisplayWidget::on_comboBox_video_fps_currentIndexChanged(int index)
 
 void VideoDisplayWidget::setFPS(int fps)
 {
-    if (camera) {
-        camera->setFPS(fps);
-    }
-}
 
-void VideoDisplayWidget::setResolution(int width, int height)
-{
-    if (!camera) return;
-    camera->setResolution(width, height);
-}
-
-void VideoDisplayWidget::startCamera(int cameraIndex)
-{
-    if (camera) {
-        stopCamera();
-    }
-
-    camera = new CameraDriver(cameraIndex);
-    connect(camera, &CameraDriver::frameReady, this, &VideoDisplayWidget::updateFrame);
-    camera->start();
-}
-
-void VideoDisplayWidget::stopCamera()
-{
-    qDebug() << "[LOG]: Stopping camera";
-
-    if (camera) {
-        camera->stopCamera();
-        camera->wait();
-        delete camera;
-        camera = nullptr;
-    }
 }
 
 void VideoDisplayWidget::updateFrame(const QImage &frame)
 {
+    if (!label_video_display) return; // protection
     label_video_display->setPixmap(QPixmap::fromImage(frame).scaled(label_video_display->size(),
                                                                     Qt::KeepAspectRatio,
                                                                     Qt::SmoothTransformation));
-}
-
-void VideoDisplayWidget::on_cameraStopped()
-{
-    label_video_display->setStyleSheet("background-color: black;");
 }

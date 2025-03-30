@@ -1,38 +1,32 @@
 #ifndef MAX30102_H
 #define MAX30102_H
 
+#pragma once
 #include <QObject>
-#include <QAtomicInt>
-
+#include "sensor_interface.h"
+#include "sensor_data.h"
 #include "i2c_driver.h"
 
-class MAX30102 : public QObject
+#define MAX30102_I2C_ADDRESS 0x57
+
+class MAX30102 : public QObject, public SensorInterface
 {
     Q_OBJECT
+
 public:
-    explicit MAX30102(int deviceAddress, QObject *parent = nullptr);
+    explicit MAX30102(I2CDriver *i2cDriver, QObject *parent = nullptr);
     ~MAX30102();
 
-public slots:
-    void process();
-    void stop();
+    bool initialize() override;
+    bool readOnce(SensorData &data) override;
+    void applySetting(const QVariantMap &params) override;
 
-    bool initialize();
     void setMode(quint8 mode);  // Set working mode (HR, SPO2, Multi-LED)
     void setSamplingRate(quint8 rate);  // Adjust sample rate
     void setLEDPulseAmplitude(quint8 amplitude);  // Adjust LED brightness
 
 private:
-    I2CDriver *i2cDriver;
-    QAtomicInt keepRunning_;
-    int deviceAddress_;
-
-    QByteArray readSensorData();
-
-signals:
-    void dataReady(const QByteArray &data);
-    void errorOccurred(const QString &error);
-    void finished();
+    I2CDriver *i2cDriver_;
 
 };
 

@@ -10,7 +10,7 @@ SensorAHT20Widget::SensorAHT20Widget(QWidget *parent)
 }
 
 SensorAHT20Widget::~SensorAHT20Widget() {
-
+    qDebug() << "[LOG]: SensorAHT20Widget Distruct";
 }
 
 void SensorAHT20Widget::initUI()
@@ -119,59 +119,8 @@ void SensorAHT20Widget::initUI()
     setLayout(mainLayout);
 }
 
-void SensorAHT20Widget::startSensorThread()
+void SensorAHT20Widget::updateValues(const float &temperature, const float &humidity)
 {
-    qDebug() << "[LOG]: Start sensor AHT20 thread";
-
-//    QStringList errorMessage;
-    i2cDriver_ = new I2CDriver(AHT20_I2C_ADDRESS, this);
-    if (!i2cDriver_->initialize()) {
-        emit sig_errorOccurred("Failed to initialize I2CDriver for AHT20");
-        return;
-    }
-    // Create Thread
-    sensorThread_ = new QThread(this);
-    aht20_ = new AHT20(i2cDriver_);
-
-    if (!aht20_->initialize()) {
-        emit sig_errorOccurred("Failed to initialize AHT20 sensor.");
-        return;
-    }
-
-    aht20_->moveToThread(sensorThread_);
-
-    connect(sensorThread_, &QThread::started, aht20_, &AHT20::startMonitorSensor);
-    connect(aht20_, &AHT20::dataReady, this, &SensorAHT20Widget::onDataReady);
-
-    sensorThread_->start();
-}
-
-void SensorAHT20Widget::onDataReady(float temperature, float humidity)
-{
-    QMetaObject::invokeMethod(this, [this, temperature, humidity]() {
-        lineEdit_temperature_value->setText(QString::number(temperature, 'f', 2) + " C");
-        lineEdit_humidity_value->setText(QString::number(humidity, 'f', 2) + " %");
-    }, Qt::QueuedConnection);
-}
-
-
-void SensorAHT20Widget::sensorReadStart()
-{
-    if (!i2cDriver_) {
-        startSensorThread();
-    }
-
-    qDebug() << "MAX30102 Sensor Reading Start.";
-    if (aht20_) {
-        QMetaObject::invokeMethod(aht20_, "startMonitorSensor", Qt::QueuedConnection);
-    }
-}
-
-
-void SensorAHT20Widget::sensorReadStop()
-{
-    qDebug() << "MAX30102 Sensor Reading Stop.";
-    if (aht20_) {
-        QMetaObject::invokeMethod(aht20_, "stopMonitoring", Qt::QueuedConnection);
-    }
+    this->lineEdit_temperature_value->setText(QString::number(temperature, 'f', 3));
+    this->lineEdit_humidity_value->setText(QString::number(humidity, 'f', 3));
 }

@@ -1,10 +1,17 @@
 #ifndef AHT20_H
 #define AHT20_H
 
+#pragma once
 #include <QObject>
-#include <QAtomicInt>
-
+#include "sensor_interface.h"
 #include "i2c_driver.h"
+#include "sensor_data.h"
+
+#define AHT20_I2C_ADDRESS     0x38  ///< I2C address of AHT20 sensor.
+#define AHT20_STATUS_REG      0x71  ///< Status register (dummy read).
+#define AHT20_CMD_TRIGGER     0xAC  ///< Trigger measurement command.
+#define AHT20_CMD_SOFT_RESET  0xBA  ///< Soft reset command.
+#define AHT20_CALIBRATION_BIT 0x08  ///< Calibration bit mask.
 
 /**
  * @brief AHT20 sensor driver class.
@@ -13,7 +20,7 @@
  * status register. When new data is available, it triggers a measurement
  * and emits a signal with the updated temperature and humidity values.
  */
-class AHT20 : public QObject
+class AHT20 : public QObject, public SensorInterface
 {
     Q_OBJECT
 
@@ -29,35 +36,16 @@ public:
      * @brief Initializes the AHT20 sensor.
      * @return true if initialization is successful, false otherwise.
      */
-    bool initialize();
+    bool initialize() override;
 
-public slots:
-    /**
-     * @brief Monitors the sensor for new data and triggers measurements.
-     *
-     * This function runs continuously in a separate thread.
-     */
-    void startMonitorSensor();
-    void stopMonitoring();
+    bool readOnce(SensorData &data) override;
 
-signals:
-    /**
-     * @brief Emitted when new temperature and humidity data is available.
-     * @param temperature The measured temperature in ��C.
-     * @param humidity The measured humidity in %.
-     */
-    void dataReady(float temperature, float humidity);
+    void applySetting(const QVariantMap &params) override;
+
 
 private:
     I2CDriver *i2cDriver_;  ///< I2C communication driver.
-    QAtomicInt keepRunning_;
-    int deviceAddress_;
-    volatile bool isReading;
 
-    /**
-     * @brief Checks if new sensor data is available.
-     * @return true if data is ready, false otherwise.
-     */
     bool checkSensorReady();
 };
 

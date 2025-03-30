@@ -12,9 +12,6 @@
 #include <QSlider>
 #include <QSpacerItem>
 #include <QComboBox>
-#include <QThread>
-
-#include "max30102.h"
 
 class SensorMAX30102Widget : public QWidget {
 
@@ -23,10 +20,6 @@ class SensorMAX30102Widget : public QWidget {
 public:
     explicit SensorMAX30102Widget(QWidget *parent = nullptr);
     ~SensorMAX30102Widget();
-
-    bool sensorReadStart();
-    bool sensorReadStop();
-    void sensorInit();
 
 private:
     void initUI();
@@ -45,8 +38,11 @@ private:
     QSlider *slider_heart_rate;
     QSlider *slider_blood_oxygen;
 
-    MAX30102 *sensor;
-    QThread *sensorThread;
+    QLineEdit *lineEdit_heart_rate_value;
+    QLineEdit *lineEdit_blood_oxygen_value;
+
+public slots:
+    void updateValues(const float &heartrate, const float &spo2);
 
 private slots:
     void on_comboBox_sampling_rate_currentIndexChanged(int index);
@@ -57,9 +53,7 @@ private slots:
     void on_slider_blood_oxygen_changed(int value);
 
 signals:
-    void sig_max30102_errorOccurred(const QString &error_message);
-    void sig_max30102_sensorInit();
-
+    void sig_SendControl(const QString &name, const QVariantMap &params);
 };
 
 #endif // SENSOR_MAX30102_H

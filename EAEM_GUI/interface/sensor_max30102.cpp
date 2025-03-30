@@ -11,11 +11,6 @@ SensorMAX30102Widget::SensorMAX30102Widget(QWidget *parent)
 
 SensorMAX30102Widget::~SensorMAX30102Widget()
 {
-    sensorReadStop();
-
-    sensorThread->quit();
-    sensorThread->wait();
-    delete sensor;
     qDebug() << "[LOG]: SensorMAX30102Widget Distructed";
 }
 
@@ -51,7 +46,7 @@ void SensorMAX30102Widget::initUI()
     // Heart rate display components
     QLabel *label_heart_rate = new QLabel("Heart Rate:");
     label_heart_rate->setMinimumSize(90, 0);
-    QLineEdit *lineEdit_heart_rate_value = new QLineEdit;
+    lineEdit_heart_rate_value = new QLineEdit;
     lineEdit_heart_rate_value->setMinimumSize(100, 0);
     lineEdit_heart_rate_value->setAlignment(Qt::AlignCenter);
     lineEdit_heart_rate_value->setReadOnly(true);
@@ -77,7 +72,7 @@ void SensorMAX30102Widget::initUI()
     // Blood oxygen display components
     QLabel *label_blood_oxygen = new QLabel("Blood Oxygen:");
     label_blood_oxygen->setMinimumSize(90, 0);
-    QLineEdit *lineEdit_blood_oxygen_value = new QLineEdit;
+    lineEdit_blood_oxygen_value = new QLineEdit;
     lineEdit_blood_oxygen_value->setMinimumSize(100, 0);
     lineEdit_blood_oxygen_value->setAlignment(Qt::AlignCenter);
     lineEdit_blood_oxygen_value->setReadOnly(true);
@@ -100,6 +95,54 @@ void SensorMAX30102Widget::initUI()
     verticalLayout_blood_oxygen->addLayout(horizontalLayout_blood_oxygen);
     verticalLayout_blood_oxygen->addWidget(slider_blood_oxygen);
 
+    // Layout for sensor sampling rate adjustment
+    QLabel *label_sampling_rate = new QLabel("Sampling Rate");
+    comboBox_sampling_rate = new QComboBox(this);
+    comboBox_sampling_rate->setMinimumSize(90, 0);
+    QStringList samplingRates = { "50Hz", "100Hz", "200Hz", "400Hz", "800Hz", "1000Hz", "1600Hz", "3200Hz" };
+    comboBox_sampling_rate->addItems(samplingRates);
+    // ....
+    // ....connect
+    connect(comboBox_sampling_rate, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [=](int index) {
+        QVariantMap params;
+        switch (index) {
+            case 0: params["sampling rate"] = 0x00; break;  // 50Hz
+            case 1: params["sampling rate"] = 0x01; break;  // 100Hz
+            case 2: params["sampling rate"] = 0x02; break;  // 200Hz
+            case 3: params["sampling rate"] = 0x03; break;  // 400Hz
+            case 4: params["sampling rate"] = 0x04; break;  // 800Hz
+            case 5: params["sampling rate"] = 0x05; break;  // 1000Hz
+            case 6: params["sampling rate"] = 0x06; break;  // 1600Hz
+            case 7: params["sampling rate"] = 0x07; break;  // 3200Hz
+        }
+        emit sig_SendControl("MAX30102", params);
+    });
+
+    // Layout for sensor red adjustment
+    QLabel *label_led_red = new QLabel("LED Red");
+    comboBox_led_red = new QComboBox(this);
+    comboBox_led_red->setMinimumSize(90, 0);
+    comboBox_led_red->addItem("30Hz");
+    // ...
+    // ....connect
+
+    // Layout for sensor IR adjustment
+    QLabel *label_led_ir = new QLabel("LED IR");
+    comboBox_led_ir = new QComboBox(this);
+    comboBox_led_ir->setMinimumSize(90, 0);
+    comboBox_led_ir->addItem("30Hz");
+    // ....
+    // ....connect
+
+    // Layout for sensor controller display
+    QHBoxLayout *horizontalLayout_sensor_controller = new QHBoxLayout;
+    horizontalLayout_sensor_controller->addWidget(label_sampling_rate);
+    horizontalLayout_sensor_controller->addWidget(comboBox_sampling_rate);
+    horizontalLayout_sensor_controller->addWidget(label_led_red);
+    horizontalLayout_sensor_controller->addWidget(comboBox_led_red);
+    horizontalLayout_sensor_controller->addWidget(label_led_ir);
+    horizontalLayout_sensor_controller->addWidget(comboBox_led_ir);
+
     // Layout for sensor value displays
     QHBoxLayout *horizontalLayout_sensor_value_display = new QHBoxLayout;
     horizontalLayout_sensor_value_display->addLayout(verticalLayout_heart_rate);
@@ -109,23 +152,13 @@ void SensorMAX30102Widget::initUI()
     QVBoxLayout *verticalLayout_max30102 = new QVBoxLayout;
     verticalLayout_max30102->addLayout(horizontalLayout_mode_config);
     verticalLayout_max30102->addLayout(horizontalLayout_sensor_value_display);
+    verticalLayout_max30102->addLayout(horizontalLayout_sensor_controller);
 
     groupBox_sensor_max30102->setLayout(verticalLayout_max30102);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(groupBox_sensor_max30102);
     setLayout(mainLayout);
-}
-
-void SensorMAX30102Widget::sensorInit()
-{
-    sensor = new MAX30102(0x57);
-    sensorThread = new QThread(this);
-    sensor->moveToThread(sensorThread);
-    sensorThread->start();
-
-    connect(this, &SensorMAX30102Widget::sig_max30102_sensorInit, sensor, &MAX30102::initialize);
-    emit sig_max30102_sensorInit();
 }
 
 void SensorMAX30102Widget::on_comboBox_sampling_rate_currentIndexChanged(int index)
@@ -158,28 +191,19 @@ void SensorMAX30102Widget::on_slider_blood_oxygen_changed(int value)
 // Slot function to handle mode selection
 void SensorMAX30102Widget::on_checkBox_mode_changed(bool checked)
 {
-//    if (!checked) return;  // Ignore unchecked state
+    if (!checked) return;  // Ignore unchecked state
 
-//    if (checkBox_heart_rate_mode->isChecked()) {
-//        qDebug() << "Heart Rate Mode Selected";
-//        i2cDriver_->setMode(0x02);
-//    } else if (checkBox_blood_oxygen_mode->isChecked()) {
-//        qDebug() << "SpO2 Mode Selected";
-//        i2cDriver_->setMode(0x03);
-//    } else if (checkBox_mixed_mode->isChecked()) {
-//        qDebug() << "Mixed Mode Selected";
-//        i2cDriver_->setMode(0x07);
-//    }
+    if (checkBox_heart_rate_mode->isChecked()) {
+        qDebug() << "Heart Rate Mode Selected";
+    } else if (checkBox_blood_oxygen_mode->isChecked()) {
+        qDebug() << "SpO2 Mode Selected";
+    } else if (checkBox_mixed_mode->isChecked()) {
+        qDebug() << "Mixed Mode Selected";
+    }
 }
 
-bool SensorMAX30102Widget::sensorReadStart()
+void SensorMAX30102Widget::updateValues(const float &heartrate, const float &spo2)
 {
-    qDebug() << "[LOG]: MAX30102 Sensor Read Start.";
-    return true;
-}
-
-bool SensorMAX30102Widget::sensorReadStop()
-{
-    qDebug() << "[LOG]: MAX30102 Sensor Read Stop.";
-    return true;
+    this->lineEdit_heart_rate_value->setText(QString::number(heartrate, 'f', 3));
+    this->lineEdit_blood_oxygen_value->setText(QString::number(spo2, 'f', 3));
 }

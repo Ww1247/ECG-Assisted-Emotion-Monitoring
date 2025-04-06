@@ -78,8 +78,8 @@ public:
 private:
 
     static QMutex i2cMutex_;     ///< Qt thread lock to ensure thread safety in I2C operations
-    int i2cHandle_;       ///< I2C handle returned by pigpio
-    int deviceAddress_;   ///< I2C device address
+    int i2cHandle_;              ///< I2C handle returned by pigpio
+    int deviceAddress_;          ///< I2C device address
 
     /**
      * @brief Converts an integer to a hexadecimal string.

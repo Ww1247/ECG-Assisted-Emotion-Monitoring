@@ -7,7 +7,10 @@
 #include "i2c_driver.h"
 #include "sensor_data.h"
 
-#define AHT20_I2C_ADDRESS     0x38  ///< I2C address of AHT20 sensor.
+/// I2C address of the AHT20 sensor.
+#define AHT20_I2C_ADDRESS     0x38
+
+/// Register definitions and command constants.
 #define AHT20_STATUS_REG      0x71  ///< Status register (dummy read).
 #define AHT20_CMD_TRIGGER     0xAC  ///< Trigger measurement command.
 #define AHT20_CMD_SOFT_RESET  0xBA  ///< Soft reset command.
@@ -16,9 +19,9 @@
 /**
  * @brief AHT20 sensor driver class.
  *
- * This class runs in a separate thread and continuously monitors the sensor's
- * status register. When new data is available, it triggers a measurement
- * and emits a signal with the updated temperature and humidity values.
+ * This class communicates with the AHT20 temperature and humidity sensor over I2C,
+ * implementing the SensorInterface for integration with the SensorManager system.
+ * It supports initialization, data reading, and optional configuration.
  */
 class AHT20 : public QObject, public SensorInterface
 {
@@ -28,24 +31,43 @@ public:
     /**
      * @brief Constructs an AHT20 sensor object.
      * @param i2cDriver A pointer to the I2C driver for communication.
+     * @param parent The parent QObject.
      */
     explicit AHT20(I2CDriver *i2cDriver, QObject *parent = nullptr);
+
+    /**
+     * @brief Destructor.
+     */
     ~AHT20();
 
     /**
      * @brief Initializes the AHT20 sensor.
-     * @return true if initialization is successful, false otherwise.
+     *
+     * Typically involves a soft reset and checking calibration status.
+     * @return true if the sensor was initialized successfully, false otherwise.
      */
     bool initialize() override;
 
+    /**
+     * @brief Reads a single temperature and humidity measurement from the sensor.
+     * @param data Output structure to hold the read values.
+     * @return true if data was read successfully, false on error.
+     */
     bool readOnce(SensorData &data) override;
 
+    /**
+     * @brief Applies additional configuration to the sensor (not used for AHT20).
+     * @param params Key-value map of configuration parameters.
+     */
     void applySetting(const QVariantMap &params) override;
 
-
 private:
-    I2CDriver *i2cDriver_;  ///< I2C communication driver.
+    I2CDriver *i2cDriver_;  ///< I2C communication driver used to talk to the sensor.
 
+    /**
+     * @brief Checks whether the sensor is calibrated and ready to provide data.
+     * @return true if sensor is ready, false otherwise.
+     */
     bool checkSensorReady();
 };
 

@@ -1,4 +1,5 @@
 #include "emotion_indicator.h"
+#include <QDebug>
 
 EmotionIndicatorWidget::EmotionIndicatorWidget(QWidget *parent)
     : QWidget(parent)
@@ -26,9 +27,9 @@ void EmotionIndicatorWidget::initUI()
     }
 
     // Create labels
-    labelJoyful = new QLabel("Joyful", this);
-    labelRelaxed = new QLabel("Relaxed", this);
-    labelAnxious = new QLabel("Anxious", this);
+    labelJoyful = new QLabel("Neutral", this);
+    labelRelaxed = new QLabel("Happy", this);
+    labelAnxious = new QLabel("Sad", this);
 
     // Align text center
     labelJoyful->setAlignment(Qt::AlignCenter);
@@ -73,3 +74,24 @@ void EmotionIndicatorWidget::append_textEditInfo_Display(const QString &message)
 {
     this->textEditInfo->append(message);
 }
+
+void EmotionIndicatorWidget::emotion_status_receiver(const QString &emotion, const QString &confident)
+{
+    this->append_textEditInfo_Display("Emotions:" + emotion + ", Confidents: " + confident);
+    if (emotion == "Neutral"){
+        labelJoyful->setStyleSheet("background-color: green;");
+    }
+    else if (emotion == "Happy"){
+        labelRelaxed->setStyleSheet("background-color: green;");
+    }
+    else if (emotion == "Sad"){
+        labelAnxious->setStyleSheet("background-color: green;");
+    }
+    else{
+        labelJoyful->setStyleSheet("");
+        labelRelaxed->setStyleSheet("");
+        labelAnxious->setStyleSheet("");
+    }
+}
+
+

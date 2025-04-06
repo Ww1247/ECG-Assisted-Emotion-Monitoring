@@ -15,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     stop_Sensor_Read();
+
     // No need to delete UI here, as it is handled by Qt's parent-child memory management
     qDebug() << "[LOG]: System Stoped";
     qDebug() << "[LOG]: Windows Closed.";
@@ -105,6 +106,7 @@ void MainWindow::initialize_SignalConnection()
     plotManager->registerPlot(ecgHrvWidget);
     plotManager->registerPlot(temperatureHumidityWidget);
 
+    /**/
     qAddPostRoutine([](){
         gpioTerminate();
         qDebug() << "[LOG]: gpioTerminate called at post-routine shutdown.";
@@ -113,28 +115,32 @@ void MainWindow::initialize_SignalConnection()
     /*Establish DashboardWidget Signal Connections*/
     connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_start, this, &MainWindow::on_pushbutton_emotion_detection_start_clicked);
     connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_stop, this, &MainWindow::on_pushbutton_emotion_detection_stop_clicked);
-
     connect(this, &MainWindow::sig_AHT20DataSend, sensorAHT20Widget, &SensorAHT20Widget::updateValues);
     connect(this, &MainWindow::sig_MAX30102DataSend, sensorMAX30102Widget, &SensorMAX30102Widget::updateValues);
     connect(this, &MainWindow::sig_CameraDataSend, videoDisplayWidget, &VideoDisplayWidget::updateFrame);
+    connect(this, &MainWindow::sig_sendEmotionandConfidence, emotionIndicatorWidget, &EmotionIndicatorWidget::emotion_status_receiver);
 
     /* SensorManager Data Handling */
     connect(manager, &SensorManager::dataReady, this, [=](const SensorData &data) {
-        if (data.name == "AHT20") {
+        if (data.sensor_name == "AHT20") {
             float t = data.values.value("temperature").toFloat();
             float h = data.values.value("humidity").toFloat();
-//            sensorAHT20Widget->updateValues(t, h);
             emit sig_AHT20DataSend(t, h);
             temperatureHumidityWidget->addData(t, h);
-        } else if (data.name == "MAX30102") {
+        } else if (data.sensor_name == "MAX30102") {
             float hr = data.values.value("heartRate").toFloat();
             float sp = data.values.value("spo2").toFloat();
             emit sig_MAX30102DataSend(hr, sp);
             ecgHrvWidget->addECGData(hr, sp);
-//            sensorMAX30102Widget->updateValues(hr, sp);
-        } else if (data.name == "Camera" && !data.image.isNull()) {
-//            videoDisplayWidget->updateFrame(data.image);
+        } else if (data.sensor_name == "Camera" && !data.image.isNull()) {
             emit sig_CameraDataSend(data.image);
+            if (data.values.contains("emotion")) {
+                QString emotion = data.values.value("emotion").toString();
+                float confidence = data.values.value("confidence").toFloat();
+                QString confidenceStr = QString::number(confidence, 'f', 3);
+                emit sig_sendEmotionandConfidence(emotion, confidenceStr);
+//                qDebug() << "[Emotion] Detected:" << emotion << "| Confidence:" << confidence;
+            }
         }
     });
 }

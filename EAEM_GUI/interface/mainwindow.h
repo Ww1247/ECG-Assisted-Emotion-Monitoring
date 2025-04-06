@@ -60,6 +60,7 @@ signals:
     void sig_AHT20DataSend(const float &temperature, const float &humidity);
     void sig_MAX30102DataSend(const float &heartrate, const float &spo2);
     void sig_CameraDataSend(const QImage &image);
+    void sig_sendEmotionandConfidence(const QString &emotion, const QString &confidence);
 
 };
 

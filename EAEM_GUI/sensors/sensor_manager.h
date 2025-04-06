@@ -24,6 +24,7 @@ public:
     void stopAll();
     bool isRunning(const QString &name) const;
     void sendControlCommand(const QString &name, const QVariantMap &params);
+    void forwardData(const SensorData &data);
 
 signals:
     void dataReady(const SensorData &data);

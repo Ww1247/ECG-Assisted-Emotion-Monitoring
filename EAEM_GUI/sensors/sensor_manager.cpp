@@ -12,7 +12,7 @@ void SensorManager::registerSensor(const QString &name, SensorInterface *sensor)
     if (!sensors_.contains(name)) {
         auto entry = QSharedPointer<SensorEntry>::create(sensor);
         sensors_.insert(name, entry);
-        qDebug() << "[SensorManager] Registered sensor:" << name;
+        qDebug() << "[LOG]: SensorManager: Registered sensor:" << name;
     }
 }
 
@@ -20,7 +20,7 @@ void SensorManager::startSensor(const QString &name)
 {
     auto it = sensors_.find(name);
     if (it == sensors_.end()) {
-        qWarning() << "[SensorManager] Sensor" << name << "not found in map.";
+        qWarning() << "[LOG] SensorManager Sensor" << name << "not found in map.";
         return;
     }
     QSharedPointer<SensorEntry> entry = it.value();
@@ -67,4 +67,9 @@ void SensorManager::sendControlCommand(const QString &name, const QVariantMap &p
         sensors_[name]->sensor->applySetting(params);
         qDebug() << "[SensorManager] Control command sent to" << name << ":" << params;
     }
+}
+
+void SensorManager::forwardData(const SensorData &data)
+{
+    emit dataReady(data);
 }

@@ -96,7 +96,7 @@ bool AHT20::readOnce(SensorData &data)
     float temperature = ((rawTemperature * 200.0f) / 1048576.0f) - 50.0f;
 
     // Fill SensorData
-    data.name = "AHT20";
+    data.sensor_name = "AHT20";
     data.timestamp = QDateTime::currentDateTime();
     data.values["temperature"] = temperature;
     data.values["humidity"] = humidity;

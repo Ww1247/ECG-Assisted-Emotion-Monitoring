@@ -2,10 +2,12 @@
 #define CAMERATHREAD_H
 
 #pragma once
+
 #include <QObject>
 #include <QImage>
 #include <atomic>
 #include <opencv2/opencv.hpp>
+#include <opencv2/dnn.hpp>
 #include "sensor_interface.h"
 #include "sensor_data.h"
 
@@ -24,14 +26,20 @@ public:
     bool initialize() override;
     bool readOnce(SensorData &data) override;
     void applySetting(const QVariantMap &params) override;
-
-    void setFPS(int newFPS);      // Set the frame rate
-    void setResolution(int width, int newHeight); // Set the resolution
+    void setFPS(int newFPS);                 // Set the frame rate
+    void setResolution(int width, int height); // Set the resolution
 
 private:
     int cameraIndex;
     std::atomic<int> fps, width, height;
     cv::VideoCapture cap;
+
+    QString predictEmotion(const cv::Mat &faceROI, double &confidenceOut);
+
+    static bool initialized;
+    static cv::dnn::Net net_;
+    static cv::CascadeClassifier faceCascade_;
+    static std::vector<std::string> emotionLabels_;
 };
 
 #endif // CAMERATHREAD_H

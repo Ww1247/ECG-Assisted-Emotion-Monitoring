@@ -8,7 +8,7 @@
 #include <QImage>
 
 struct SensorData {
-    QString name;
+    QString sensor_name;
     QVariantMap values;
     QImage image;
     QDateTime timestamp;

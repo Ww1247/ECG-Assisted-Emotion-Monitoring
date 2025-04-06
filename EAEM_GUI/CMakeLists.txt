@@ -29,10 +29,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 else()
     add_executable(EAEM_GUI
         ${PROJECT_SOURCES}
-        arithmetic/facial_analyzer.h arithmetic/facial_analyzer.cpp
-        arithmetic/ecg_analyzer.h arithmetic/ecg_analyzer.cpp
-        arithmetic/video_processor.h arithmetic/video_processor.cpp
-
         driver/qcustomplot.h driver/qcustomplot.cpp
         driver/i2c_driver.h driver/i2c_driver.cpp
         driver/camera_driver.h driver/camera_driver.cpp
@@ -86,3 +82,9 @@ install(TARGETS EAEM_GUI
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(EAEM_GUI)
 endif()
+
+configure_file(${CMAKE_SOURCE_DIR}/model/emotion-ferplus-2.onnx
+               ${CMAKE_CURRENT_BINARY_DIR}/emotion-ferplus-2.onnx COPYONLY)
+
+configure_file(${CMAKE_SOURCE_DIR}/model/haarcascade_frontalface_default.xml
+               ${CMAKE_CURRENT_BINARY_DIR}/haarcascade_frontalface_default.xml COPYONLY)

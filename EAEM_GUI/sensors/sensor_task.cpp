@@ -19,7 +19,7 @@ void SensorTask::run()
 
     while (!stopFlag_->load()) {
         SensorData data;
-        data.name = name_;
+        data.sensor_name = name_;
         data.timestamp = QDateTime::currentDateTime();
 
         if (sensor_->readOnce(data)) {
@@ -27,7 +27,7 @@ void SensorTask::run()
         } else {
             emit errorOccurred(name_, "Read failed.");
         }
-        QThread::msleep(50);
+        QThread::msleep(10);
     }
 
     qDebug() << "[SensorTask]" << name_ << "stopped.";

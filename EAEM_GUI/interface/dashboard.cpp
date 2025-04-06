@@ -72,7 +72,8 @@ void DashboardWidget::updateSystemDateTime(QLabel *dateLabel, QLabel *timeLabel)
 
 void DashboardWidget::on_pushButton_EmotionDetection_Start_Clicked()
 {
-    pushButton_start_emotion_detection->setEnabled(false);
+    set_pushbuton_enable_start();
+//    pushButton_start_emotion_detection->setEnabled(false);
     emit sig_emotion_detection_start();
 }
 

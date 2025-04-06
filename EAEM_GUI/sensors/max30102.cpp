@@ -86,7 +86,7 @@ bool MAX30102::readOnce(SensorData &data)
     float spo2 = 95.0f + (irRaw % 3);         // mock SpO2
 
     // Fill SensorData
-    data.name = "MAX30102";
+    data.sensor_name = "MAX30102";
     data.timestamp = QDateTime::currentDateTime();
     data.values["heartRate"] = heartRate;
     data.values["spo2"] = spo2;

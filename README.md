@@ -85,6 +85,7 @@ Here is the Raspberry Pi cross-compilation instructions: ([English](https://gith
 
 # Version Information
 Current Version: 1.0.0
+
 Release Date: April 2025
 
 # Contributors

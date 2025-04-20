@@ -51,9 +51,11 @@ void MainWindow::UI_SetUp()
     sensorMAX30102Widget = new SensorMAX30102Widget(this);
     verticalLayout_Sensors->addWidget(sensorMAX30102Widget,1);
 
+#if CONFIG_AHT20_SENSOR_FUNCTION_ENABLE
     // AHT20 Sensor Module
     sensorAHT20Widget = new SensorAHT20Widget(this);
     verticalLayout_Sensors->addWidget(sensorAHT20Widget,1);
+#endif
 
     horizontalLayout_Controler->addLayout(verticalLayout_Sensors,1);
     mainLayout->addLayout(horizontalLayout_Controler,0);
@@ -63,8 +65,10 @@ void MainWindow::UI_SetUp()
     mainLayout->addWidget(ecgHrvWidget,1);
 
     // Temperature & Humidity Module
+#if CONFIG_TEM_HUMID_FUNCTION_ENABLE
     temperatureHumidityWidget = new TemperatureHumidityWidget(this);
     mainLayout->addWidget(temperatureHumidityWidget,1);
+#endif
 
     // Set Layout and Central Widget
     centralWidget->setLayout(mainLayout);
@@ -77,6 +81,7 @@ void MainWindow::initialize_SignalConnection()
     /*SensorManager Instantiation*/
     manager = new SensorManager(this);
 
+#if CONFIG_AHT20_SENSOR_FUNCTION_ENABLE
     /*Register AHT20 Sensor*/
     I2CDriver *i2c_aht20 = new I2CDriver(AHT20_I2C_ADDRESS, this);
     if (!i2c_aht20->initialize()) {
@@ -86,6 +91,7 @@ void MainWindow::initialize_SignalConnection()
     }
     AHT20 *aht20 = new AHT20(i2c_aht20);
     manager->registerSensor("AHT20", aht20);
+#endif
 
     /*Register MAX30102 Sensor*/
     I2CDriver *i2c_max30102 = new I2CDriver(MAX30102_I2C_ADDRESS, this);
@@ -104,7 +110,10 @@ void MainWindow::initialize_SignalConnection()
     /*Register Plotting Refresh Manager*/
     plotManager = new PlotRefreshManager(this);
     plotManager->registerPlot(ecgHrvWidget);
+
+#if CONFIG_TEM_HUMID_FUNCTION_ENABLE
     plotManager->registerPlot(temperatureHumidityWidget);
+#endif
 
     /**/
     qAddPostRoutine([](){
@@ -115,19 +124,27 @@ void MainWindow::initialize_SignalConnection()
     /*Establish DashboardWidget Signal Connections*/
     connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_start, this, &MainWindow::on_pushbutton_emotion_detection_start_clicked);
     connect(dashboardWidget, &DashboardWidget::sig_emotion_detection_stop, this, &MainWindow::on_pushbutton_emotion_detection_stop_clicked);
+
+#if CONFIG_AHT20_SENSOR_FUNCTION_ENABLE
     connect(this, &MainWindow::sig_AHT20DataSend, sensorAHT20Widget, &SensorAHT20Widget::updateValues);
+#endif
+
     connect(this, &MainWindow::sig_MAX30102DataSend, sensorMAX30102Widget, &SensorMAX30102Widget::updateValues);
     connect(this, &MainWindow::sig_CameraDataSend, videoDisplayWidget, &VideoDisplayWidget::updateFrame);
     connect(this, &MainWindow::sig_sendEmotionandConfidence, emotionIndicatorWidget, &EmotionIndicatorWidget::emotion_status_receiver);
 
     /* SensorManager Data Handling */
     connect(manager, &SensorManager::dataReady, this, [=](const SensorData &data) {
+
+#if CONFIG_AHT20_SENSOR_FUNCTION_ENABLE
         if (data.sensor_name == "AHT20") {
             float t = data.values.value("temperature").toFloat();
             float h = data.values.value("humidity").toFloat();
             emit sig_AHT20DataSend(t, h);
             temperatureHumidityWidget->addData(t, h);
-        } else if (data.sensor_name == "MAX30102") {
+        } else
+#endif
+        if (data.sensor_name == "MAX30102") {
             float hr = data.values.value("heartRate").toFloat();
             float sp = data.values.value("spo2").toFloat();
             emit sig_MAX30102DataSend(hr, sp);
@@ -154,7 +171,11 @@ void MainWindow::on_pushbutton_emotion_detection_start_clicked()
 void MainWindow::start_Sensor_Read()
 {
     qDebug() << "[LOG]: Turn On Sensor Reading ...";
+
+#if CONFIG_AHT20_SENSOR_FUNCTION_ENABLE
     manager->startSensor("AHT20");
+#endif
+
     manager->startSensor("MAX30102");
     manager->startSensor("Camera");
     qDebug() << "[LOG]: Sensor reading started.";

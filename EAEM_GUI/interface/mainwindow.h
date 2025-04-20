@@ -23,6 +23,9 @@
 #include "i2c_driver.h"
 #include "plot_refresh_manager.h"
 
+#define CONFIG_AHT20_SENSOR_FUNCTION_ENABLE 0
+#define CONFIG_TEM_HUMID_FUNCTION_ENABLE    0
+
 /**
  * @brief The MainWindow class serves as the main application window integrating all sensor components,
  * dashboard controls, emotion indicators, and data plotting widgets.

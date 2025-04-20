@@ -69,5 +69,4 @@ private:
     void updatePlots();
 };
 
-
 #endif // TEMPERATURE_HUMIDITY_H

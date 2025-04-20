@@ -45,6 +45,7 @@ void EcgHrvWidget::initUI()
 
     groupBox_ECG->setLayout(verticalLayout_ECG);
 
+#if CONFIG_HRV_UI_DISPLAY_ENABLE
     // HRV Group Box
     QGroupBox *groupBox_HRV = new QGroupBox("HRV", this);
 
@@ -81,11 +82,15 @@ void EcgHrvWidget::initUI()
     verticalLayout_HRV->addWidget(frame_HRV);
 
     groupBox_HRV->setLayout(verticalLayout_HRV);
+#endif
 
     // Main Layout
     QHBoxLayout *horizontalLayout_MAX30102 = new QHBoxLayout;
     horizontalLayout_MAX30102->addWidget(groupBox_ECG);
+
+#if CONFIG_HRV_UI_DISPLAY_ENABLE
     horizontalLayout_MAX30102->addWidget(groupBox_HRV);
+#endif
 
     setLayout(horizontalLayout_MAX30102);
 
@@ -142,9 +147,12 @@ void EcgHrvWidget::set_UI_EnableDisable(const bool &status)
     radioButton_ECG_display->setEnabled(status);
     radioButton_blood_oxygen_display->setEnabled(status);
     radioButton_avg_heart_rate_display->setEnabled(status);
+
+#if CONFIG_HRV_UI_DISPLAY_ENABLE
     radioButton_HRV_RMSSD->setEnabled(status);
     radioButton_HRV_SDNN->setEnabled(status);
     radioButton_HRV_LF_HF->setEnabled(status);
+#endif
 }
 
 void EcgHrvWidget::addECGData(float heartRate, float spo2)
@@ -164,6 +172,7 @@ void EcgHrvWidget::addECGData(float heartRate, float spo2)
     }
 }
 
+#if CONFIG_HRV_UI_DISPLAY_ENABLE
 void EcgHrvWidget::addHRVData(float rmssd, float sdnn, float lf_hf)
 {
     hrvRMSSD_ << rmssd;
@@ -176,6 +185,7 @@ void EcgHrvWidget::addHRVData(float rmssd, float sdnn, float lf_hf)
         hrvLFHF_.removeFirst();
     }
 }
+#endif
 
 void EcgHrvWidget::updatePlots()
 {
@@ -194,6 +204,7 @@ void EcgHrvWidget::updatePlots()
     customPlot_ECG->yAxis->rescale();
     customPlot_ECG->replot(QCustomPlot::rpQueuedReplot);
 
+#if CONFIG_HRV_UI_DISPLAY_ENABLE
     // HRV Curve
     QVector<double> x(hrvRMSSD_.size());
     for (int i = 0; i < x.size(); ++i)
@@ -209,6 +220,7 @@ void EcgHrvWidget::updatePlots()
     customPlot_HRV->xAxis->setRange(0, hrvRMSSD_.size());
     customPlot_HRV->yAxis->rescale();
     customPlot_HRV->replot(QCustomPlot::rpQueuedReplot);
+#endif
 }
 
 void EcgHrvWidget::updatePlot()

@@ -104,7 +104,7 @@ change the height and width for each of the contributors from 80 to 50.
 
 | Name         | ID       | Role                                                                                                                              |
 | ------------ |:--------:| --------------------------------------------------------------------------------------------------------------------------------- |
-|              | 3007288W | Responsible for the QT part of the code, including GUI design and communication code creation.                                    |
+| Jiajun Wang  | 3007288W | Responsible for the QT, including GUI design and communication code creation.                                                     |
 |              |          |                                                                                                                                   |
 |              |          |                                                                                                                                   |
 | Xinyu Chen   | 2867562C | Responsible for HeartRate part of the code.                                                                                       |

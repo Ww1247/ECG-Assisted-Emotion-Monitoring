@@ -39,17 +39,17 @@ Here is the Raspberry Pi cross-compilation instructions: ([English](https://gith
 
 # Features
 
-## 1. Facial Expression Recognition & Emotion Analysis  
+## 1. Emotion Monitoring 
 - **Hardware**: Raspberry Pi Camera (CSI interface).  
 - **Workflow**:  
   - Captures real-time facial video via GStreamer pipeline.  
-  - Uses **dlib** for face detection and **ONNX Runtime** to classify emotions (positive/negative/neutral) via a lightweight deep learning model.  
+  - Uses **dlib** for face detection and **ONNX Runtime** to classify emotions (positive/negative/neutral).  
   - Displays emotion probabilities (softmax-normalized scores) on video frames with bounding boxes and labels.
 
-## 2. Heart Rate Monitoring & Signal Analysis  
+## 2. Heart Rate Monitoring 
 - **Hardware**: MAX30102 sensor (I2C interface).  
 - **Workflow**:  
-  - Collects IR photoplethysmography (PPG) data for heart rate calculation.  
+  - Collects IR data for heart rate calculation.  
   - Applies low-pass filtering and peak detection to derive heart rate (BPM).  
   - Visualizes real-time PPG waveforms and BPM values using **Qt Charts** in a GUI.  
 

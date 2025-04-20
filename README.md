@@ -81,7 +81,7 @@ Here is the Raspberry Pi cross-compilation instructions: ([English](https://gith
 
 ## MAX30102 Sensor Setup  
 1. Connect the sensor to the Raspberry Pi via I2C pins.  
-2. Enable I2C in `raspi-config` and verify connectivity using `i2cdetect`.
+2. Enable I2C in raspi-config and verify connectivity using i2cdetect.
 
 # Version Information
 Current Version: 1.0.0
@@ -97,8 +97,7 @@ change the height and width for each of the contributors from 80 to 50.
 
 [//]: contributor-faces
 
-  <img src="https://avatars.githubusercontent.com/u/199613138?v=4" title="Student_Name" width="50" height="50" style="border-radius: 50%; object-fit: cover;">
-  <img src="https://avatars.githubusercontent.com/u/128835450?s=400&u=b5ecb292c1a067e392b97c62b5ac3e576df1d874&v=4" title="Student_Name" width="50" height="50" style="border-radius: 50%; object-fit: cover;">
+  <img src="https://avatars.githubusercontent.com/u/199613138?v=4" title="Student_Name" width="50" height="50" style="border-radius: 50%; object-fit: cover;"> <img src="https://avatars.githubusercontent.com/u/128835450?s=400&u=b5ecb292c1a067e392b97c62b5ac3e576df1d874&v=4" title="Student_Name" width="50" height="50" style="border-radius: 50%; object-fit: cover;">
 
 [//]: contributor-faces
 

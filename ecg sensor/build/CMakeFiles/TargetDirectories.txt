@@ -1,0 +1,4 @@
+/home/pi/Desktop/I2C05/build/CMakeFiles/HeartRateWithPlot.dir
+/home/pi/Desktop/I2C05/build/CMakeFiles/edit_cache.dir
+/home/pi/Desktop/I2C05/build/CMakeFiles/rebuild_cache.dir
+/home/pi/Desktop/I2C05/build/CMakeFiles/HeartRateWithPlot_autogen.dir

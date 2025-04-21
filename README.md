@@ -351,18 +351,4 @@ change the height and width for each of the contributors from 80 to 50.
 
 <img src="https://avatars.githubusercontent.com/u/199613138?v=4" title="Student_Name" width="50" height="50" style="border-radius: 50%; object-fit: cover;"> <img src="https://avatars.githubusercontent.com/u/195966921?v=4" title="Student_Name" width="50" height="50" style="border-radius: 50%; object-fit: cover;"> <img src="https://avatars.githubusercontent.com/u/201265472?s=400&v=4" title="Student_Name" width="50" height="50" style="border-radius: 50%; object-fit: cover;"> <img src="https://avatars.githubusercontent.com/u/128835450?s=400&u=b5ecb292c1a067e392b97c62b5ac3e576df1d874&v=4" title="Student_Name" width="50" height="50" style="border-radius: 50%; object-fit: cover;">
 
-| Name         | ID       | Role                                                                                                                              |
-| ------------ |:--------:| --------------------------------------------------------------------------------------------------------------------------------- |
-| Jiajun Wang  | 3007288W | Responsible for the QT part of the code, including GUI design and communication code creation.                                    |
-| Xin Guo      | 2935682G | Responsible for Emotion Monitoring part of the code.                                                                              |
-| Shaohan Tian | 3025822T | Responsible for hardware installation and HeartRate part of the code.                                                             |
-| Xinyu Chen   | 2867562C | Responsible for HeartRate part of the code.                                                                                       |
 
-# License
-
-MIT License Copyright (c) 2025 Wx1247
-
-
-[//]: contributor-faces
-
-[//]: contributor-faces

@@ -354,7 +354,7 @@ change the height and width for each of the contributors from 80 to 50.
 | ------------ |:--------:| --------------------------------------------------------------------------------------------------------------------------------- |
 | Jiajun Wang  | 3007288W | Responsible for the QT part of the code, including GUI design and communication code creation.                                    |
 | Xin Guo      | 2935682G | Responsible for Emotion Monitoring part of the code.                                                                              |
-| Shaohan Tian | 3025822T | Responsible for hardware installation and HeartRate part of the code.                                                             |
+| Shaohan Tian | 3025822T | Responsible for hardware installation and HeartRate part of the code. Video producing.                                                            |
 | Xinyu Chen   | 2867562C | Responsible for HeartRate part of the code.                                                                                       |
 
 # License

@@ -1,5 +1,6 @@
 # Director
 build
+.vscode
 
 # C++ objects and libs
 *.slo

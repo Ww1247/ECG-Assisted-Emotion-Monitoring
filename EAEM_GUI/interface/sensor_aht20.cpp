@@ -1,10 +1,20 @@
 #include "sensor_aht20.h"
+#include <QDebug>
 
-SensorAHT20Widget::SensorAHT20Widget(QWidget *parent) : QWidget(parent) {
+#define AHT20_I2C_ADDRESS  0x38
+
+SensorAHT20Widget::SensorAHT20Widget(QWidget *parent)
+    : QWidget(parent)
+{
     initUI();
 }
 
-void SensorAHT20Widget::initUI() {
+SensorAHT20Widget::~SensorAHT20Widget() {
+    qDebug() << "[LOG]: SensorAHT20Widget Distruct";
+}
+
+void SensorAHT20Widget::initUI()
+{
     // Create AHT20 sensor group box
     QGroupBox *groupBox_sensor_aht20 = new QGroupBox("AHT20", this);
     groupBox_sensor_aht20->setGeometry(120, 190, 624, 100);
@@ -12,7 +22,7 @@ void SensorAHT20Widget::initUI() {
     // Temperature display
     QLabel *label_temperature = new QLabel("Temperature:");
     label_temperature->setMinimumSize(90, 0);
-    QLineEdit *lineEdit_temperature_value = new QLineEdit;
+    lineEdit_temperature_value = new QLineEdit;
     lineEdit_temperature_value->setMinimumSize(100, 0);
     lineEdit_temperature_value->setAlignment(Qt::AlignCenter);
     lineEdit_temperature_value->setReadOnly(true);
@@ -51,7 +61,7 @@ void SensorAHT20Widget::initUI() {
     // Humidity display
     QLabel *label_humidity = new QLabel("Humidity:");
     label_humidity->setMinimumSize(90, 0);
-    QLineEdit *lineEdit_humidity_value = new QLineEdit;
+    lineEdit_humidity_value = new QLineEdit;
     lineEdit_humidity_value->setMinimumSize(100, 0);
     lineEdit_humidity_value->setAlignment(Qt::AlignCenter);
     lineEdit_humidity_value->setReadOnly(true);
@@ -107,4 +117,10 @@ void SensorAHT20Widget::initUI() {
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(groupBox_sensor_aht20);
     setLayout(mainLayout);
+}
+
+void SensorAHT20Widget::updateValues(const float &temperature, const float &humidity)
+{
+    this->lineEdit_temperature_value->setText(QString::number(temperature, 'f', 3));
+    this->lineEdit_humidity_value->setText(QString::number(humidity, 'f', 3));
 }

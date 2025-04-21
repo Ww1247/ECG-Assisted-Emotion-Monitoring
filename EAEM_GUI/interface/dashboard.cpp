@@ -1,6 +1,8 @@
 #include "dashboard.h"
 
-DashboardWidget::DashboardWidget(QWidget *parent) : QWidget(parent) {
+DashboardWidget::DashboardWidget(QWidget *parent)
+    : QWidget(parent)
+{
     initUI();
 }
 
@@ -10,8 +12,12 @@ void DashboardWidget::initUI() {
     groupBox_Dashboard->setGeometry(10, 20, 960, 65);
 
     // Create buttons
-    QPushButton *pushButton_start_emotion_detection = new QPushButton("Start Emotion Detection");
-    QPushButton *pushButton_stop_emotion_detection = new QPushButton("Stop Emotion Detection");
+    pushButton_start_emotion_detection = new QPushButton("Start Emotion Detection");
+    connect(pushButton_start_emotion_detection, &QPushButton::clicked, this, &DashboardWidget::on_pushButton_EmotionDetection_Start_Clicked);
+
+    pushButton_stop_emotion_detection = new QPushButton("Stop Emotion Detection");
+    pushButton_stop_emotion_detection->setEnabled(false);
+    connect(pushButton_stop_emotion_detection, &QPushButton::clicked, this, &DashboardWidget::on_pushButton_EmotionDetection_Stop_Clicked);
 
     // Create labels for system date and time
     QLabel *label_system_date = new QLabel();
@@ -62,4 +68,29 @@ void DashboardWidget::updateSystemDateTime(QLabel *dateLabel, QLabel *timeLabel)
 
     dateLabel->setText("Date: " + currentDate);
     timeLabel->setText("Time: " + currentTime);
+}
+
+void DashboardWidget::on_pushButton_EmotionDetection_Start_Clicked()
+{
+    set_pushbuton_enable_start();
+//    pushButton_start_emotion_detection->setEnabled(false);
+    emit sig_emotion_detection_start();
+}
+
+void DashboardWidget::on_pushButton_EmotionDetection_Stop_Clicked()
+{
+    set_pushbuton_enable_stop();
+    emit sig_emotion_detection_stop();
+}
+
+void DashboardWidget::set_pushbuton_enable_start()
+{
+    this->pushButton_start_emotion_detection->setEnabled(false);
+    this->pushButton_stop_emotion_detection->setEnabled(true);
+}
+
+void DashboardWidget::set_pushbuton_enable_stop()
+{
+    this->pushButton_start_emotion_detection->setEnabled(true);
+    this->pushButton_stop_emotion_detection->setEnabled(false);
 }

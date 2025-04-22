@@ -1,7 +1,7 @@
 <div align="center">
     <img src="Documents/pictures/EAEM-Logo.png"/ width=300>
     <p>
-      <i align="center">An ECG-Assisted Emotion Monitoring System that captures facial expressions via a camera and extracts micro-expression features using image recognition. By integrating ECG signals, the system aims to assess physical exertion and emotional strain during exercise.🫀</i>
+      <i align="center">An ECG-Assisted Emotion Monitoring System that captures facial expressions via a camera and extracts micro-expression features using image recognition. By integrating ECG signals, the system aims to develop an ECG-assisted emotion monitoring system that captures facial expressions via a camera and extracts micro-expression features using image recognition. By integrating ECG signals,the system aims for precise emotion assessment, enhancing mental health monitoring and awareness.🫀</i>
     </p>
     <div id="badges">
      <a href="operation system"><img src="https://img.shields.io/badge/Debian-A81D33?logo=debian&logoColor=fff"/></a>

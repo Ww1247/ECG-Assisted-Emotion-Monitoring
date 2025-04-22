@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>1000</width><height>600</height></rect></property>
+  <property name="windowTitle"><string>表情识别 + 心率监测</string></property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="mainLayout">
+    <item>
+     <layout class="QVBoxLayout" name="leftLayout">
+      <item>
+       <widget class="QLabel" name="videoLabel">
+        <property name="minimumSize"><size><width>480</width><height>360</height></size></property>
+        <property name="frameShape"><enum>QFrame::Box</enum></property>
+        <property name="alignment"><set>Qt::AlignCenter</set></property>
+        <property name="text"><string>摄像头画面</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="startButton">
+        <property name="text"><string>开始检测</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="resultLabel">
+        <property name="text"><string>10秒最多情绪:</string></property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="rightLayout">
+      <item>
+       <widget class="QLabel" name="rateLabel">
+        <property name="text"><string>BPM: --</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="statusLabel">
+        <property name="text"><string>状态: --</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="maxRateLabel">
+        <property name="text"><string>10秒最大心率: --</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QChartView" name="chartView"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

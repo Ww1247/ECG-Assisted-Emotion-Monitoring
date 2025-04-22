@@ -330,7 +330,63 @@ sudo vcgencmd get_camera
 sudo i2cdetect -y 1  
 # Should show device at 0x57
 ```
+## CameraDriver Module
+1. Constructor and Parameter Initialization
+The CameraDriver class is designed to interface with a video capture device, typically a webcam, for the purposes of facial and emotional recognition. Upon instantiation, the constructor accepts parameters including the camera index, desired resolution (width and height), and target frames per second (FPS). These values are stored internally and used during the camera initialization phase to configure the capture settings.
 
+CameraDriver::CameraDriver(int cameraIndex, int width, int height, int fps, QObject *parent)
+This modular design enables flexible deployment across various hardware configurations, supporting both high-performance and resource-constrained environments.
+
+2. Camera and Model Initialization
+The initialize() method is responsible for preparing the camera and loading all necessary machine learning assets. It opens the video stream using OpenCV with the V4L2 backend and sets the frame width, height, FPS, and buffer size to ensure low-latency acquisition.
+
+Additionally, this method ensures that model assets are only loaded once using a static initialization flag. Specifically:
+A Haar cascade classifier (haarcascade_frontalface_default.xml) is loaded for face detection.
+A pre-trained emotion recognition model (emotion-ferplus-2.onnx) is loaded using OpenCV’s deep neural network module (cv::dnn::Net).
+Emotion labels (e.g., "Happy", "Sad", "Neutral") are defined for classification output interpretation.
+
+cap.set(cv::CAP_PROP_FRAME_WIDTH, width.load());
+cap.set(cv::CAP_PROP_FRAME_HEIGHT, height.load());
+cap.set(cv::CAP_PROP_FPS, fps.load());
+This setup ensures the camera is optimized for real-time processing and the model is ready for inference.
+
+3. Frame Capture and Emotion Inference
+The readOnce() method serves as the core data processing routine. It performs the following steps:
+Captures a single frame from the camera stream.
+Converts and clones the frame into BGR format.
+Detects faces in the image using the Haar cascade classifier.
+For each detected face, it invokes predictEmotion() to determine the emotional state.
+Annotates the original frame with bounding boxes and labels showing the predicted emotion and confidence.
+Converts the processed image to RGB and encapsulates it into a QImage for Qt UI compatibility.
+Stores the results in a SensorData structure, including emotion label, confidence score, and timestamp.
+
+faceCascade_.detectMultiScale(bgrFrame, faces, 1.3, 5);
+This method enables seamless integration of computer vision and machine learning within a real-time application context.
+
+4. Emotion Prediction Using ONNX Model
+The predictEmotion() method is a dedicated function for executing inference using a pre-trained ONNX model. It accepts a region of interest (ROI) corresponding to a detected face and processes it as follows:
+
+Converts the image to grayscale and resizes it to 64×64 pixels.
+Normalizes the pixel values and converts the image into a blob format suitable for model input.
+Feeds the blob into the ONNX model and retrieves the output probabilities.
+Determines the class index with the highest confidence and maps it to the corresponding emotion label.
+
+
+cv::Mat blob = cv::dnn::blobFromImage(gray);  // [1,1,64,64]
+net_.setInput(blob);
+cv::Mat prob = net_.forward();
+The method outputs both the predicted emotion and the associated confidence level, providing interpretable results for downstream UI display.
+
+5. Dynamic Camera Settings Adjustment
+The CameraDriver class also supports runtime updates to camera settings via:
+setFPS(int newFPS): Adjusts the frame rate during operation.
+setResolution(int newWidth, int newHeight): Updates the resolution parameters.
+applySetting(const QVariantMap &params): A placeholder for future extensions that could accept a configuration map.
+
+cap.set(cv::CAP_PROP_FPS, fps.load());
+cap.set(cv::CAP_PROP_FRAME_WIDTH, width.load());
+cap.set(cv::CAP_PROP_FRAME_HEIGHT, height.load());
+These interfaces enable adaptive tuning of the camera module based on system load or user preference, ensuring operational flexibility.
 # Version Information
 
 Current Version: 1.0.0

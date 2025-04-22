@@ -1,7 +1,7 @@
 <div align="center">
     <img src="Documents/pictures/EAEM-Logo.png"/ width=300>
     <p>
-      <i align="center">An ECG-Assisted Emotion Monitoring System that captures facial expressions via a camera and extracts micro-expression features using image recognition. By integrating ECG signals, the system aims to assess physical exertion and emotional strain during exercise.🫀</i>
+      <i align="center">An ECG-Assisted Emotion Monitoring System that captures facial expressions via a camera and extracts micro-expression features using image recognition. By integrating ECG signals, the system aims to develop an ECG-assisted emotion monitoring system that captures facial expressions via a camera and extracts micro-expression features using image recognition. By integrating ECG signals,the system aims for precise emotion assessment, enhancing mental health monitoring and awareness.🫀</i>
     </p>
     <div id="badges">
      <a href="operation system"><img src="https://img.shields.io/badge/Debian-A81D33?logo=debian&logoColor=fff"/></a>
@@ -354,7 +354,7 @@ change the height and width for each of the contributors from 80 to 50.
 | ------------ |:--------:| --------------------------------------------------------------------------------------------------------------------------------- |
 | Jiajun Wang  | 3007288W | Responsible for the QT part of the code, including GUI design and communication code creation.                                    |
 | Xin Guo      | 2935682G | Responsible for Emotion Monitoring part of the code.                                                                              |
-| Shaohan Tian | 3025822T | Responsible for hardware installation and HeartRate part of the code. Video producing.                                                            |
+| Shaohan Tian | 3025822T | Responsible for hardware installation and HeartRate part of the code. Video producing.                                            |
 | Xinyu Chen   | 2867562C | Responsible for HeartRate part of the code.                                                                                       |
 
 # License

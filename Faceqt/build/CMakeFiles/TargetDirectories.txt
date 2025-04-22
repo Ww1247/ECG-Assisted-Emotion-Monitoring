@@ -1,0 +1,4 @@
+/home/pi/Desktop/F/src/build/CMakeFiles/FACEqt.dir
+/home/pi/Desktop/F/src/build/CMakeFiles/edit_cache.dir
+/home/pi/Desktop/F/src/build/CMakeFiles/rebuild_cache.dir
+/home/pi/Desktop/F/src/build/CMakeFiles/FACEqt_autogen.dir
